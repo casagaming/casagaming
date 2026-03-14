@@ -82,25 +82,17 @@ export default function CategoriesPage() {
                     />
                     <div className="absolute inset-0 bg-black/40" />
                     <div className="absolute bottom-8 left-8">
-                      <h3 className="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tighter">{category.name_en}</h3>
+                      <h3 className="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tighter">{category.name_ar || category.name_en}</h3>
                     </div>
                   </div>
 
                   {/* List (Hover State) */}
                   <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-6 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:-translate-y-3 group-hover:-translate-x-3 ${style.bg} border-2 ${style.accent}`}>
                     
-                    <span className={`text-xs font-mono uppercase tracking-widest mb-3 ${style.text} opacity-70`}>
-                      {category.subtitle_en || 'EXPLORE COLLECTION'}
-                    </span>
-                    
                     <h3 className={`text-3xl md:text-4xl font-display font-black uppercase tracking-tighter mb-4 ${style.text} leading-[0.9]`}>
-                      {category.name_en}
+                      {category.name_ar || category.name_en}
                     </h3>
                     
-                    <p className={`text-sm md:text-base font-medium leading-relaxed max-w-[250px] ${style.text}`}>
-                      {category.description_en || `View our complete range of ${category.name_en.toLowerCase()}.`}
-                    </p>
-
                     <div className="absolute bottom-8 left-0 right-0 flex justify-center">
                       <Link 
                         to={`/products?category=${encodeURIComponent(category.name_en)}`}

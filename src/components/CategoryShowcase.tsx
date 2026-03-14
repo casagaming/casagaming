@@ -57,24 +57,16 @@ export default function CategoryShowcase() {
                   />
                   <div className="absolute inset-0 bg-black/30" />
                   <div className="absolute bottom-10 left-10">
-                    <h3 className="text-4xl font-display font-bold text-white uppercase tracking-tighter">{category.name_en}</h3>
+                    <h3 className="text-4xl font-display font-bold text-white uppercase tracking-tighter">{category.name_ar || category.name_en}</h3>
                   </div>
                 </div>
 
                 {/* List (Hover State) */}
                 <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-8 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:-translate-y-3 group-hover:-translate-x-3 ${styles.bg} border-2 ${styles.accent}`}>
                   
-                  <span className={`text-sm font-mono uppercase tracking-widest mb-4 ${styles.text} opacity-70`}>
-                    {category.subtitle_en || styles.subtitle}
-                  </span>
-                  
                   <h3 className={`text-5xl md:text-6xl font-display font-black uppercase tracking-tighter mb-6 ${styles.text} leading-[0.9]`}>
-                    {category.name_en}
+                    {category.name_ar || category.name_en}
                   </h3>
-                  
-                  <p className={`text-lg font-medium leading-relaxed max-w-xs ${styles.text}`}>
-                    {category.description_en || category.description || `Engineered for performance and durability.`}
-                  </p>
 
                   <div className="absolute bottom-10 left-0 right-0 flex justify-center">
                     <Link 

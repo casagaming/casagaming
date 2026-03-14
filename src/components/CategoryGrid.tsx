@@ -82,7 +82,7 @@ export default function CategoryGrid() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
                 
                 <div className="absolute bottom-0 left-0 p-4 w-full">
-                  <h3 className="text-white font-bold text-lg mb-1 group-hover:text-neon-blue transition-colors">{category.name_en}</h3>
+                  <h3 className="text-white font-bold text-lg mb-1 group-hover:text-neon-blue transition-colors">{category.name_ar || category.name_en}</h3>
                   <p className="text-gray-400 text-xs">{category.count}</p>
                 </div>
               </Link>
