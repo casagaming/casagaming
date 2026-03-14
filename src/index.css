@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Light Mode (Default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f4f5;
+  --card-bg: #ffffff;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --border-color: #e4e4e7;
+  --neon-blue: #00f3ff;
+  --neon-purple: #bc13fe;
+}
+
+.dark {
+  /* Dark Mode */
+  --bg-primary: #050505;
+  --bg-secondary: #0a0a0a;
+  --card-bg: #0a0a0a;
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --border-color: #27272a;
+}
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Rajdhani", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-neon-blue: var(--neon-blue);
+  --color-neon-purple: var(--neon-purple);
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-card-bg: var(--card-bg);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border-color: var(--border-color);
+}
+
+@layer base {
+  body {
+    @apply bg-bg-primary text-text-primary font-sans antialiased transition-colors duration-300;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display uppercase tracking-wider;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-neon-purple;
+  }
+  
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+                linear-gradient(to right, var(--neon-blue), var(--neon-purple)) border-box;
+  }
+
+  .clip-path-slant {
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+  }
+}
