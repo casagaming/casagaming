@@ -22,14 +22,18 @@ export default function HomePage() {
           .limit(6);
         
         if (newError) throw newError;
-        if (newData) setNewArrivals(newData.map((p: any) => ({ 
-          ...p, 
-          name: p.name_en, 
-          image: p.image_url,
-          isNew: p.is_new,
-          isSale: p.is_sale,
-          originalPrice: p.original_price
-        })));
+        if (newData) setNewArrivals(newData.map((p: any) => {
+          const images = Array.isArray(p.image_url) ? p.image_url : [p.image_url];
+          return {
+            ...p, 
+            name: p.name_en, 
+            image: images[0],
+            hoverImage: images.length > 1 ? images[1] : undefined,
+            isNew: p.is_new,
+            isSale: p.is_sale,
+            originalPrice: p.original_price
+          };
+        }));
 
         // Fetch Popular Products (Featured or high rating/reviews)
         const { data: popData, error: popError } = await supabase
@@ -39,14 +43,18 @@ export default function HomePage() {
           .limit(12);
         
         if (popError) throw popError;
-        if (popData) setPopularProducts(popData.map((p: any) => ({ 
-          ...p, 
-          name: p.name_en, 
-          image: p.image_url,
-          isNew: p.is_new,
-          isSale: p.is_sale,
-          originalPrice: p.original_price
-        })));
+        if (popData) setPopularProducts(popData.map((p: any) => {
+          const images = Array.isArray(p.image_url) ? p.image_url : [p.image_url];
+          return {
+            ...p, 
+            name: p.name_en, 
+            image: images[0],
+            hoverImage: images.length > 1 ? images[1] : undefined,
+            isNew: p.is_new,
+            isSale: p.is_sale,
+            originalPrice: p.original_price
+          };
+        }));
       } catch (error) {
         console.error('Error fetching home data:', error);
       }

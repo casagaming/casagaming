@@ -78,6 +78,7 @@ export default function ProductsPage() {
               category: item.categories?.name_en || 'Other',
               name: item.name_en,
               image: images[0],
+              hoverImage: images.length > 1 ? images[1] : undefined,
               images: images,
               isNew: item.is_new,
               isSale: item.is_sale,

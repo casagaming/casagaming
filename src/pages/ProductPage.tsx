@@ -7,6 +7,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 
+const getHighQualityUrl = (url: string | null | undefined) => {
+  if (!url) return '';
+  if (url.includes('cloudinary.com') && url.includes('/upload/')) {
+    if (url.includes('/upload/q_')) return url;
+    return url.replace('/upload/', '/upload/q_100,f_auto/');
+  }
+  return url;
+};
+
 export default function ProductPage() {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
@@ -38,12 +47,15 @@ export default function ProductPage() {
         if (error) throw error;
         
         if (data) {
-          const images = Array.isArray(data.image_url) ? data.image_url : [data.image_url];
+          const rawImages = Array.isArray(data.image_url) ? data.image_url : [data.image_url];
+          const variantImages = data.variants?.map((v: any) => v.image_url).filter(Boolean) || [];
+          const allImages = Array.from(new Set([...rawImages, ...variantImages]));
+          
           const formattedProduct = {
             ...data,
             name: data.name_en,
-            image: images[0],
-            images: images,
+            image: allImages[0],
+            images: allImages,
             isNew: data.is_new,
             isSale: data.is_sale,
             originalPrice: data.original_price,
@@ -110,14 +122,13 @@ export default function ProductPage() {
             <AnimatePresence mode="wait">
               <motion.img
                 key={currentDisplayImage || activeImageIndex}
-                src={currentDisplayImage || product.images[activeImageIndex]}
+                src={getHighQualityUrl(currentDisplayImage || product.images[activeImageIndex])}
                 alt={product.name}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className={`w-full h-full object-cover ${isOutOfStock ? 'grayscale opacity-50' : ''}`}
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </AnimatePresence>
             {product.isSale && (
@@ -143,7 +154,7 @@ export default function ProductPage() {
                     (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color hover:border-text-secondary'
                   }`}
                 >
-                  <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" style={{ imageRendering: '-webkit-optimize-contrast' }} />
+                  <img src={getHighQualityUrl(img)} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
