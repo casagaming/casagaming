@@ -72,14 +72,16 @@ export default function ProductsPage() {
         
         if (data) {
           const formattedProducts = data.map((item: any) => {
-            const images = Array.isArray(item.image_url) ? item.image_url : [item.image_url];
+            const rawImages = Array.isArray(item.image_url) && item.image_url.length > 0 
+              ? item.image_url 
+              : (Array.isArray(item.images) && item.images.length > 0 ? item.images : [item.image_url || item.images || '']);
             return {
               ...item,
               category: item.categories?.name_en || 'Other',
               name: item.name_en,
-              image: images[0],
-              hoverImage: images.length > 1 ? images[1] : undefined,
-              images: images,
+              image: rawImages[0],
+              hoverImage: rawImages.length > 1 ? rawImages[1] : undefined,
+              images: rawImages,
               isNew: item.is_new,
               isSale: item.is_sale,
               originalPrice: item.original_price

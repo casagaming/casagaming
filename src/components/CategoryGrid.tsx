@@ -10,27 +10,14 @@ export default function CategoryGrid() {
   useEffect(() => {
     const fetchCategoriesData = async () => {
       try {
-        // Fetch categories
         const { data: cats, error: catsError } = await supabase
           .from('categories')
-          .select('*');
+          .select('id, name_ar, name_en, image_url');
         
         if (catsError) throw catsError;
 
         if (cats) {
-          // Fetch product counts for each category
-          const categoriesWithCounts = await Promise.all(cats.map(async (cat: any) => {
-            const { count, error: countError } = await supabase
-              .from('products')
-              .select('*', { count: 'exact', head: true })
-              .eq('category_id', cat.id);
-            
-            return {
-              ...cat,
-              count: `${count || 0} Products`
-            };
-          }));
-          setCategories(categoriesWithCounts);
+          setCategories(cats);
         }
       } catch (error) {
         console.error('Error fetching categories for grid:', error);
@@ -83,7 +70,6 @@ export default function CategoryGrid() {
                 
                 <div className="absolute bottom-0 left-0 p-4 w-full">
                   <h3 className="text-white font-bold text-lg mb-1 group-hover:text-neon-blue transition-colors">{category.name_ar || category.name_en}</h3>
-                  <p className="text-gray-400 text-xs">{category.count}</p>
                 </div>
               </Link>
             </motion.div>

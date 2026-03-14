@@ -29,7 +29,7 @@ export default function Navbar() {
       try {
         const { data, error } = await supabase
           .from('categories')
-          .select('*')
+          .select('id, name_en, name_ar')
           .order('name_en', { ascending: true });
         
         if (error) throw error;

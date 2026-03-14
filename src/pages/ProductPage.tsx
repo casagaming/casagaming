@@ -47,7 +47,9 @@ export default function ProductPage() {
         if (error) throw error;
         
         if (data) {
-          const rawImages = Array.isArray(data.image_url) ? data.image_url : [data.image_url];
+          const rawImages = Array.isArray(data.image_url) && data.image_url.length > 0 
+            ? data.image_url 
+            : (Array.isArray(data.images) && data.images.length > 0 ? data.images : [data.image_url || data.images || '']);
           const variantImages = data.variants?.map((v: any) => v.image_url).filter(Boolean) || [];
           const allImages = Array.from(new Set([...rawImages, ...variantImages]));
           
@@ -192,6 +194,10 @@ export default function ProductPage() {
             </div>
           )}
 
+          <p className="text-text-secondary mb-8 leading-relaxed text-lg font-light border-l-2 border-border-color pl-6">
+            {product.description_ar || product.description_en || `Experience gaming like never before with the ${product.name}. Engineered for precision, speed, and durability, this is the ultimate upgrade for your battle station. Features premium materials and cutting-edge technology to give you the competitive edge.`}
+          </p>
+
           {/* Variants Selection */}
           {product.variants && product.variants.length > 0 && (
             <div className="mb-8 border-t border-border-color pt-6">
@@ -218,10 +224,6 @@ export default function ProductPage() {
               </div>
             </div>
           )}
-
-          <p className="text-text-secondary mb-10 leading-relaxed text-lg font-light border-l-2 border-border-color pl-6">
-            {product.description_en || product.description_ar || `Experience gaming like never before with the ${product.name}. Engineered for precision, speed, and durability, this is the ultimate upgrade for your battle station. Features premium materials and cutting-edge technology to give you the competitive edge.`}
-          </p>
 
           <div className="mb-10">
             {isOutOfStock ? (

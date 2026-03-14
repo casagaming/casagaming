@@ -17,7 +17,7 @@ export default function HomePage() {
         // Fetch New Arrivals (is_new = true)
         const { data: newData, error: newError } = await supabase
           .from('products')
-          .select('*')
+          .select('*, categories(name_en)')
           .eq('is_new', true)
           .limit(6);
         
@@ -26,6 +26,7 @@ export default function HomePage() {
           const images = Array.isArray(p.image_url) ? p.image_url : [p.image_url];
           return {
             ...p, 
+            category: p.categories?.name_en || 'Gear',
             name: p.name_en, 
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,
@@ -38,7 +39,7 @@ export default function HomePage() {
         // Fetch Popular Products (Featured or high rating/reviews)
         const { data: popData, error: popError } = await supabase
           .from('products')
-          .select('*')
+          .select('*, categories(name_en)')
           .order('reviews_count', { ascending: false })
           .limit(12);
         
@@ -47,6 +48,7 @@ export default function HomePage() {
           const images = Array.isArray(p.image_url) ? p.image_url : [p.image_url];
           return {
             ...p, 
+            category: p.categories?.name_en || 'Gear',
             name: p.name_en, 
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,

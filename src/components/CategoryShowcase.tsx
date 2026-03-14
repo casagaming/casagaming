@@ -17,7 +17,7 @@ export default function CategoryShowcase() {
       try {
         const { data, error } = await supabase
           .from('categories')
-          .select('*')
+          .select('id, name_ar, name_en, image_url')
           .limit(3);
         
         if (error) throw error;

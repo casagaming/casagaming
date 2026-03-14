@@ -7,10 +7,7 @@ interface Category {
   id: string;
   name_en: string;
   name_ar: string;
-  slug: string;
   image_url?: string;
-  description_en?: string;
-  subtitle_en?: string;
 }
 
 export default function CategoriesPage() {
@@ -23,7 +20,7 @@ export default function CategoriesPage() {
       try {
         const { data, error } = await supabase
           .from('categories')
-          .select('*')
+          .select('id, name_en, name_ar, image_url')
           .order('name_en', { ascending: true });
         
         if (error) throw error;

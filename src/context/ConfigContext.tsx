@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 interface StoreConfig {
   store_name: string;
   logo_url: string;
-  hero_image_url: string;
+  hero_images: string[];
   contact_phone: string;
   contact_email: string;
   contact_address: string;
