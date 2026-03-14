@@ -27,6 +27,10 @@ export default function OrderReceivedPage() {
               products (
                 name_en,
                 image_url
+              ),
+              product_variants (
+                name_en,
+                image_url
               )
             )
           `)
@@ -78,12 +82,25 @@ export default function OrderReceivedPage() {
         </h2>
         
         <div className="space-y-4 mb-8">
-          {order.order_items?.map((item: any) => (
-            <div key={item.id} className="flex justify-between items-center text-sm font-mono uppercase">
-              <span className="text-text-secondary">{item.products?.name_en || 'Product'} x{item.quantity}</span>
+          {order.order_items?.map((item: any) => {
+            const images = Array.isArray(item.products?.image_url) ? item.products.image_url : [item.products?.image_url];
+            const displayImage = item.product_variants?.image_url || images[0];
+            return (
+            <div key={item.id} className="flex items-center gap-4 text-sm font-mono uppercase pb-2 border-b border-border-color last:border-0">
+              {displayImage && (
+                <img 
+                  src={displayImage} 
+                  alt="" 
+                  className="w-12 h-12 object-cover border border-border-color bg-bg-primary" 
+                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
+                />
+              )}
+              <div className="flex-1">
+                <span className="text-text-secondary">{item.products?.name_en || 'Product'} {item.product_variants ? `- ${item.product_variants.name_en}` : ''} x{item.quantity}</span>
+              </div>
               <span className="text-text-primary font-bold">{(item.price * item.quantity)} DA</span>
             </div>
-          ))}
+          )})}
         </div>
 
         <div className="border-t border-border-color pt-6 space-y-3">

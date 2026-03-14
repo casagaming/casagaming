@@ -12,6 +12,7 @@ export default function ProductPage() {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [currentDisplayImage, setCurrentDisplayImage] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
@@ -51,7 +52,7 @@ export default function ProductPage() {
           };
           setProduct(formattedProduct);
           if (formattedProduct.variants && formattedProduct.variants.length > 0) {
-            setSelectedVariant(formattedProduct.variants[0]);
+            // Do not select a variant by default so user can clearly see options
           }
         }
       } catch (error) {
@@ -83,12 +84,17 @@ export default function ProductPage() {
   const isLowStock = product.stock > 0 && product.stock <= 5;
 
   const handleAddToCart = () => {
+    if (product.variants && product.variants.length > 0 && !selectedVariant) {
+      addToast('Please select an option first', 'error');
+      return false;
+    }
     const productToCart = { ...product, selectedVariant };
     for (let i = 0; i < quantity; i++) {
       addToCart(productToCart);
     }
     const variantSuffix = selectedVariant ? ` - ${selectedVariant.name_en}` : '';
     addToast(`Added ${quantity} ${product.name}${variantSuffix} to cart`, 'success');
+    return true;
   };
 
   return (
@@ -103,14 +109,15 @@ export default function ProductPage() {
           <div className="bg-bg-secondary border border-border-color overflow-hidden aspect-square relative group">
             <AnimatePresence mode="wait">
               <motion.img
-                key={selectedVariant?.id || activeImageIndex}
-                src={selectedVariant?.image_url || product.images[activeImageIndex]}
+                key={currentDisplayImage || activeImageIndex}
+                src={currentDisplayImage || product.images[activeImageIndex]}
                 alt={product.name}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 className={`w-full h-full object-cover ${isOutOfStock ? 'grayscale opacity-50' : ''}`}
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
               />
             </AnimatePresence>
             {product.isSale && (
@@ -131,12 +138,12 @@ export default function ProductPage() {
               {product.images.map((img: string, index: number) => (
                 <button
                   key={index}
-                  onClick={() => setActiveImageIndex(index)}
+                  onClick={() => { setActiveImageIndex(index); setCurrentDisplayImage(null); }}
                   className={`aspect-square border-2 transition-all overflow-hidden bg-bg-secondary ${
-                    activeImageIndex === index ? 'border-neon-blue' : 'border-border-color hover:border-text-secondary'
+                    (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color hover:border-text-secondary'
                   }`}
                 >
-                  <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" style={{ imageRendering: '-webkit-optimize-contrast' }} />
                 </button>
               ))}
             </div>
@@ -184,7 +191,10 @@ export default function ProductPage() {
                 {product.variants.map((variant: any) => (
                   <button
                     key={variant.id}
-                    onClick={() => setSelectedVariant(variant)}
+                    onClick={() => {
+                      setSelectedVariant(variant);
+                      if (variant.image_url) setCurrentDisplayImage(variant.image_url);
+                    }}
                     className={`px-4 py-2 border font-mono text-sm transition-all ${
                       selectedVariant?.id === variant.id 
                         ? 'border-neon-blue bg-neon-blue/10 text-text-primary' 
@@ -232,8 +242,9 @@ export default function ProductPage() {
                 </button>
                 <button
                   onClick={() => {
-                    handleAddToCart();
-                    navigate('/checkout');
+                    if (handleAddToCart()) {
+                      navigate('/checkout');
+                    }
                   }}
                   className="w-full sm:w-auto flex-1 bg-text-primary text-bg-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all flex items-center justify-center gap-3 group"
                 >

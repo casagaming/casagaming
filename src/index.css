@@ -46,6 +46,12 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display uppercase tracking-wider;
   }
+
+  /* Improve image rendering quality globally */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
 }
 
 @layer utilities {
