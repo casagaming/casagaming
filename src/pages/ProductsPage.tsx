@@ -42,6 +42,8 @@ export default function ProductsPage() {
           name_en: row[0] as string,
           name_ar: row[1] as string,
         }));
+        
+        // Always include 'All', but only show other categories if they exist
         setDbCategories([{ name_en: 'All', name_ar: 'الكل' }, ...cats]);
       } catch (error) {
         console.error('Error fetching categories for filter:', error);

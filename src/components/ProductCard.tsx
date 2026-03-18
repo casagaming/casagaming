@@ -44,12 +44,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <Link to={`/product/${product.id}`} className="block">
         {/* Badges */}
         <div className={`absolute top-3 ${isRTL ? 'right-3' : 'left-3'} z-10 flex flex-col gap-2`}>
-          {product.isNew && (
+          {!!product.isNew && (
             <span className="px-2 py-1 bg-neon-blue text-black text-xs font-bold uppercase tracking-wider">
               {language === 'ar' ? 'جديد' : 'Nouveau'}
             </span>
           )}
-          {product.isSale && (
+          {!!product.isSale && (
             <span className="px-2 py-1 bg-neon-purple text-white text-xs font-bold uppercase tracking-wider">
               {t('product.sale')}
             </span>

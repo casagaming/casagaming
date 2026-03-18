@@ -42,6 +42,8 @@ export default function CategoryGrid() {
     );
   }
 
+  if (categories.length === 0) return null;
+
   return (
     <section className="py-16 bg-bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,8 +74,11 @@ export default function CategoryGrid() {
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-                <div className="absolute bottom-0 left-0 p-4 w-full">
-                  <h3 className="text-white font-bold text-lg mb-1 group-hover:text-neon-blue transition-colors">{category.name_ar || category.name_en}</h3>
+                <div className="absolute bottom-0 left-0 p-4 w-full flex flex-col gap-2">
+                  <h3 className="text-white font-bold text-lg group-hover:text-neon-blue transition-colors">{category.name_ar || category.name_en}</h3>
+                  <div className="sm:hidden mt-1 px-3 py-1.5 bg-neon-blue text-black text-[10px] font-bold uppercase tracking-tighter w-fit rounded-sm shadow-[0_0_10px_rgba(0,243,255,0.3)]">
+                    {language === 'ar' ? 'دخول' : 'ENTRER'}
+                  </div>
                 </div>
               </Link>
             </motion.div>

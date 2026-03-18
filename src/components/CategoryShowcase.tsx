@@ -35,11 +35,9 @@ export default function CategoryShowcase() {
     fetchCategories();
   }, []);
 
-  const categoriesToShow = dbCategories.length > 0 ? dbCategories : [
-    { id: 'keyboards', name_en: 'Keyboards', image_url: 'https://res.cloudinary.com/dwgp11ukd/image/upload/v1772992306/alexander-swoboda-pc9_ke2pxf.jpg' },
-    { id: 'mice', name_en: 'Mice', image_url: 'https://res.cloudinary.com/dwgp11ukd/image/upload/v1772991808/andre-lang-huynh-opulentg_zfups1.jpg' },
-    { id: 'audio', name_en: 'Audio', image_url: 'https://res.cloudinary.com/dwgp11ukd/image/upload/v1772991810/andre-lang-huynh-opulenta_ckhgje.jpg' },
-  ];
+  if (dbCategories.length === 0) return null;
+
+  const categoriesToShow = dbCategories;
 
   return (
     <section className="py-24 px-4 bg-bg-primary overflow-hidden">
@@ -66,8 +64,8 @@ export default function CategoryShowcase() {
                   </div>
                 </div>
 
-                <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-8 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:-translate-y-3 group-hover:-translate-x-3 ${styles.bg} border-2 ${styles.accent}`}>
-                  <h3 className={`text-5xl md:text-6xl font-display font-black uppercase tracking-tighter mb-6 ${styles.text} leading-[0.9]`}>
+                <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-8 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible md:group-hover:-translate-y-3 md:group-hover:-translate-x-3 max-md:opacity-100 max-md:visible ${styles.bg} border-2 ${styles.accent}`}>
+                  <h3 className={`text-4xl md:text-6xl font-display font-black uppercase tracking-tighter mb-6 ${styles.text} leading-[0.9]`}>
                     {language === 'ar' ? category.name_ar : category.name_en}
                   </h3>
                   <div className="absolute bottom-10 left-0 right-0 flex justify-center">

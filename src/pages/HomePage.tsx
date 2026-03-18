@@ -44,8 +44,8 @@ export default function HomePage() {
             stock: row[8],
             rating: row[9],
             reviews_count: row[10],
-            category_en: row[11] || 'Gear',
-            category_ar: row[12] || 'معدات',
+            category_en: row[11],
+            category_ar: row[12],
             name: language === 'ar' ? row[2] : row[1],
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,
@@ -92,8 +92,8 @@ export default function HomePage() {
             stock: row[8],
             rating: row[9],
             reviews_count: row[10],
-            category_en: row[11] || 'Gear',
-            category_ar: row[12] || 'معدات',
+            category_en: row[11],
+            category_ar: row[12],
             name: language === 'ar' ? row[2] : row[1],
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,
@@ -117,17 +117,21 @@ export default function HomePage() {
       <Hero />
       <Marquee />
 
-      <ProductGrid
-        title={language === 'ar' ? 'وصل حديثاً' : 'Nouveautés'}
-        products={newArrivals}
-        linkHref="/products"
-      />
+      {newArrivals.length > 0 && (
+        <ProductGrid
+          title={language === 'ar' ? 'وصل حديثاً' : 'Nouveautés'}
+          products={newArrivals}
+          linkHref="/products"
+        />
+      )}
 
-      <ProductGrid
-        title={language === 'ar' ? 'الأكثر شعبية' : 'Produits Populaires'}
-        products={popularProducts}
-        linkHref="/products"
-      />
+      {popularProducts.length > 0 && (
+        <ProductGrid
+          title={language === 'ar' ? 'الأكثر شعبية' : 'Produits Populaires'}
+          products={popularProducts}
+          linkHref="/products"
+        />
+      )}
 
       <CategoryGrid />
 
