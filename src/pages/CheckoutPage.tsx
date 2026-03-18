@@ -2,32 +2,32 @@ import { useState, useEffect } from 'react';
 import { ArrowRight, CreditCard, Lock, MapPin, Truck, Search, ChevronDown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-
-// Wilayas will be fetched from the database
+import { turso } from '../lib/turso';
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
   const [shippingMethod, setShippingMethod] = useState<'home' | 'desk'>('home');
   const [wilayas, setWilayas] = useState<any[]>([]);
-  const [selectedWilaya, setSelectedWilaya] = useState<number>(16); // Default Algiers
+  const [selectedWilaya, setSelectedWilaya] = useState<number>(16);
   const [shippingCost, setShippingCost] = useState(0);
   const [loadingWilayas, setLoadingWilayas] = useState(true);
   const [isWilayaDropdownOpen, setIsWilayaDropdownOpen] = useState(false);
   const [wilayaSearch, setWilayaSearch] = useState('');
 
-  // Fetch wilayas from Supabase
   useEffect(() => {
     const fetchWilayas = async () => {
       try {
-        const { data, error } = await supabase
-          .from('shipping_rates')
-          .select('*')
-          .order('wilaya_name_en', { ascending: true });
-        
-        if (error) throw error;
-        if (data) setWilayas(data);
+        const result = await turso.execute(
+          'SELECT * FROM shipping_rates ORDER BY wilaya_name_en ASC'
+        );
+        const cols = result.columns;
+        const rows = result.rows.map((row: any) => {
+          const obj: any = {};
+          cols.forEach((col, i) => { obj[col] = row[i]; });
+          return obj;
+        });
+        setWilayas(rows);
       } catch (error) {
         console.error('Error fetching wilayas:', error);
       } finally {
@@ -38,7 +38,6 @@ export default function CheckoutPage() {
     fetchWilayas();
   }, []);
 
-  // Form State
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -47,7 +46,6 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Calculate shipping cost based on selection
   useEffect(() => {
     const wilaya = wilayas.find(w => w.wilaya_id === selectedWilaya);
     if (wilaya) {
@@ -59,7 +57,6 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError(null);
 
-    // Validation
     if (firstName.length > 20 || lastName.length > 20) {
       setError('First name and last name must be 20 characters or less.');
       return;
@@ -79,45 +76,34 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
     try {
       const selectedWilayaData = wilayas.find(w => w.wilaya_id === selectedWilaya);
-      
-      // 1. Create Order
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          customer_name: `${firstName} ${lastName}`,
-          phone: phone,
-          wilaya: selectedWilayaData?.wilaya_name_en || 'Unknown',
-          commune: municipality,
-          address: shippingMethod === 'home' ? address : 'STOP DESK',
-          shipping_price: shippingCost,
-          total_price: (cartTotal * 200) + shippingCost,
-          status: 'pending'
-        })
-        .select()
-        .single();
 
-      // 2. Create Order Items
-      const orderItems = items.map(item => ({
-        order_id: order.id,
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.price,
-        variant_id: item.selectedVariant?.id || null
-      }));
+      const orderResult = await turso.execute({
+        sql: `INSERT INTO orders (customer_name, phone, wilaya, commune, address, shipping_price, total_price, status)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`,
+        args: [
+          `${firstName} ${lastName}`,
+          phone,
+          selectedWilayaData?.wilaya_name_en || 'Unknown',
+          municipality,
+          shippingMethod === 'home' ? address : 'STOP DESK',
+          shippingCost,
+          (cartTotal * 200) + shippingCost,
+          'pending',
+        ],
+      });
 
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
+      const orderId = orderResult.rows[0]?.[0] as string;
+      if (!orderId) throw new Error('Failed to create order');
 
-      if (itemsError) throw itemsError;
-
-      // 3. Clear Cart and Redirect
-      clearCart();
-      if (order && order.id) {
-        navigate(`/order-received?order_id=${order.id}`);
-      } else {
-        navigate('/');
+      for (const item of items) {
+        await turso.execute({
+          sql: `INSERT INTO order_items (order_id, product_id, quantity, price, variant_id) VALUES (?, ?, ?, ?, ?)`,
+          args: [orderId, item.id, item.quantity, item.price, (item as any).selectedVariant?.id || null],
+        });
       }
+
+      clearCart();
+      navigate(`/order-received?order_id=${orderId}`);
     } catch (error: any) {
       console.error('Error submitting order:', error);
       setError('Failed to submit order. Please try again.');
@@ -140,8 +126,6 @@ export default function CheckoutPage() {
   return (
     <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-        {/* Checkout Form */}
         <form onSubmit={handleConfirmOrder}>
           <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-12 font-display uppercase tracking-tighter">Checkout</h1>
 
@@ -151,7 +135,6 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          {/* Contact Info */}
           <div className="mb-12">
             <h2 className="text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2">Contact Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -182,15 +165,12 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Shipping Address */}
           <div className="mb-12">
             <h2 className="text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2">Shipping Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="md:col-span-2 relative">
                 <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">Wilaya (State)</label>
-                
-                {/* Searchable Dropdown Button */}
-                <div 
+                <div
                   className="w-full p-4 bg-white border border-border-color text-black flex items-center justify-between cursor-pointer font-mono text-base uppercase"
                   onClick={() => setIsWilayaDropdownOpen(!isWilayaDropdownOpen)}
                 >
@@ -200,7 +180,6 @@ export default function CheckoutPage() {
                   <ChevronDown size={16} className={`transition-transform ${isWilayaDropdownOpen ? 'rotate-180' : ''}`} />
                 </div>
 
-                {/* Dropdown Menu */}
                 {isWilayaDropdownOpen && (
                   <div className="absolute z-[100] left-0 right-0 mt-1 bg-white border border-border-color shadow-2xl max-h-72 overflow-y-auto custom-scrollbar">
                     <div className="sticky top-0 bg-white p-2 border-b border-gray-100">
@@ -217,10 +196,10 @@ export default function CheckoutPage() {
                         />
                       </div>
                     </div>
-                    
+
                     {wilayas
-                      .filter(w => 
-                        w.wilaya_name_en.toLowerCase().includes(wilayaSearch.toLowerCase()) || 
+                      .filter(w =>
+                        w.wilaya_name_en.toLowerCase().includes(wilayaSearch.toLowerCase()) ||
                         w.wilaya_id.toString().includes(wilayaSearch)
                       )
                       .map(w => (
@@ -252,7 +231,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Shipping Method Selection */}
             <div className="space-y-4 mb-8">
               <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">Delivery Method</label>
 
@@ -289,7 +267,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Address Field - Only if Home Delivery */}
             {shippingMethod === 'home' && (
               <div className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
                 <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">Home Address</label>
@@ -314,23 +291,22 @@ export default function CheckoutPage() {
           </button>
         </form>
 
-        {/* Order Summary Sidebar */}
         <div>
           <div className="bg-bg-secondary p-8 border border-border-color sticky top-32">
             <h2 className="text-xl font-bold text-text-primary mb-8 font-display uppercase tracking-wider border-b border-border-color pb-4">Order Summary</h2>
 
             <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {items.map((item) => (
-                <div key={item.cartItemId} className="flex gap-4 items-center group">
+                <div key={(item as any).cartItemId} className="flex gap-4 items-center group">
                   <div className="w-16 h-16 bg-bg-primary border border-border-color relative flex-shrink-0">
                     <span className="absolute -top-2 -right-2 w-5 h-5 bg-neon-blue text-black text-xs font-bold flex items-center justify-center font-mono">{item.quantity}</span>
-                    <img src={item.selectedVariant?.image_url || item.image} alt={item.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <img src={(item as any).selectedVariant?.image_url || (item as any).image} alt={(item as any).name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-text-primary text-sm truncate font-display uppercase tracking-wide">
-                      {item.name} {item.selectedVariant ? `- ${item.selectedVariant.name_en}` : ''}
+                      {(item as any).name} {(item as any).selectedVariant ? `- ${(item as any).selectedVariant.name_en}` : ''}
                     </h4>
-                    <p className="text-xs text-text-secondary font-mono uppercase">{item.category}</p>
+                    <p className="text-xs text-text-secondary font-mono uppercase">{(item as any).category}</p>
                   </div>
                   <span className="font-bold text-text-primary whitespace-nowrap font-mono">${(item.price * item.quantity).toFixed(2)}</span>
                 </div>
@@ -356,7 +332,6 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

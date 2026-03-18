@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { supabase } from '../lib/supabase';
+import { turso } from '../lib/turso';
 
 export default function Hero() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -9,16 +9,11 @@ export default function Hero() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const { data, error } = await supabase
-          .from('banners')
-          .select('image_url')
-          .eq('is_active', true)
-          .order('order_index', { ascending: true });
-        
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setImages(data.map(b => b.image_url));
-        }
+        const result = await turso.execute(
+          'SELECT image_url FROM banners WHERE is_active = 1 ORDER BY order_index ASC'
+        );
+        const imgs = result.rows.map((row: any) => row[0] as string).filter(Boolean);
+        if (imgs.length > 0) setImages(imgs);
       } catch (error) {
         console.error('Error fetching banners:', error);
       }
@@ -39,7 +34,6 @@ export default function Hero() {
     return (
       <div className="relative h-[35vh] md:h-screen w-full overflow-hidden bg-bg-primary transition-colors duration-300">
         <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-            {/* Loading or placeholder state if no banners are available */}
         </div>
       </div>
     );
@@ -47,7 +41,6 @@ export default function Hero() {
 
   return (
     <div className="relative h-[35vh] md:h-screen w-full overflow-hidden bg-bg-primary transition-colors duration-300">
-      {/* Background Slideshow */}
       <div className="absolute inset-0">
         <AnimatePresence mode="popLayout">
           <motion.img
@@ -61,8 +54,6 @@ export default function Hero() {
             transition={{ duration: 2.5, ease: "easeInOut" }}
           />
         </AnimatePresence>
-        
-        {/* Overlay for better button visibility */}
         <div className="absolute inset-0 bg-black/30" />
       </div>
     </div>

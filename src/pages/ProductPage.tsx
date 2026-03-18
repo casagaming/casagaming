@@ -1,10 +1,10 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Star, ShoppingCart, Truck, ShieldCheck, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Star, ShoppingCart, Truck, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { supabase } from '../lib/supabase';
+import { turso, parseImageUrl } from '../lib/turso';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const getHighQualityUrl = (url: string | null | undefined) => {
@@ -32,43 +32,66 @@ export default function ProductPage() {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select(`
-            *,
-            categories (
-              name_en
-            ),
-            variants:product_variants(*)
-          `)
-          .eq('id', id)
-          .single();
-        
-        if (error) throw error;
-        
-        if (data) {
-          const rawImages = Array.isArray(data.image_url) && data.image_url.length > 0 
-            ? data.image_url 
-            : (Array.isArray(data.images) && data.images.length > 0 ? data.images : [data.image_url || data.images || '']);
-          const variantImages = data.variants?.map((v: any) => v.image_url).filter(Boolean) || [];
-          const allImages = Array.from(new Set([...rawImages, ...variantImages]));
-          
-          const formattedProduct = {
-            ...data,
-            name: data.name_en,
-            image: allImages[0],
-            images: allImages,
-            isNew: data.is_new,
-            isSale: data.is_sale,
-            originalPrice: data.original_price,
-            category: data.categories?.name_en || 'Other',
-            variants: data.variants || []
-          };
-          setProduct(formattedProduct);
-          if (formattedProduct.variants && formattedProduct.variants.length > 0) {
-            // Do not select a variant by default so user can clearly see options
-          }
+        const productResult = await turso.execute({
+          sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
+                       p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
+                       p.description_en, p.description_ar,
+                       c.name_en AS category_name, p.images
+                FROM products p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.id = ?`,
+          args: [id!],
+        });
+
+        if (productResult.rows.length === 0) {
+          setLoading(false);
+          return;
         }
+
+        const row = productResult.rows[0] as any[];
+        const primaryImage = row[5] ? [row[5]] : [];
+        const extraImages = parseImageUrl(row[14]);
+        const rawImages = Array.from(new Set([...primaryImage, ...extraImages])).filter(Boolean);
+
+        const variantsResult = await turso.execute({
+          sql: 'SELECT id, name_en, name_ar, image_url, stock FROM product_variants WHERE product_id = ?',
+          args: [id!],
+        });
+
+        const variants = variantsResult.rows.map((vrow: any) => ({
+          id: vrow[0],
+          name_en: vrow[1],
+          name_ar: vrow[2],
+          image_url: vrow[3],
+          stock: vrow[4],
+        }));
+
+        const variantImages = variants.map((v: any) => v.image_url).filter(Boolean);
+        const allImages = Array.from(new Set([...rawImages, ...variantImages]));
+
+        setProduct({
+          id: row[0],
+          name_en: row[1],
+          name_ar: row[2],
+          price: row[3],
+          original_price: row[4],
+          image_url: row[5],
+          is_new: row[6],
+          is_sale: row[7],
+          stock: row[8],
+          rating: row[9],
+          reviews: row[10],
+          description_en: row[11],
+          description_ar: row[12],
+          category: row[13] || 'Other',
+          name: row[1],
+          image: allImages[0],
+          images: allImages,
+          isNew: row[6],
+          isSale: row[7],
+          originalPrice: row[4],
+          variants,
+        });
       } catch (error) {
         console.error('Error fetching product:', error);
       } finally {
@@ -118,7 +141,6 @@ export default function ProductPage() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Product Images Gallery */}
         <div className="space-y-4">
           <div className="bg-bg-secondary border border-border-color overflow-hidden aspect-square relative group">
             <AnimatePresence mode="wait">
@@ -145,7 +167,6 @@ export default function ProductPage() {
             )}
           </div>
 
-          {/* Thumbnails */}
           {product.images.length > 1 && (
             <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
               {product.images.map((img: string, index: number) => (
@@ -163,7 +184,6 @@ export default function ProductPage() {
           )}
         </div>
 
-        {/* Product Info */}
         <div>
           <span className="text-neon-blue font-bold tracking-widest uppercase text-sm mb-2 block font-mono">
             {product.category}
@@ -195,10 +215,9 @@ export default function ProductPage() {
           )}
 
           <p className="text-text-secondary mb-8 leading-relaxed text-lg font-light border-l-2 border-border-color pl-6">
-            {product.description_ar || product.description_en || `Experience gaming like never before with the ${product.name}. Engineered for precision, speed, and durability, this is the ultimate upgrade for your battle station. Features premium materials and cutting-edge technology to give you the competitive edge.`}
+            {product.description_ar || product.description_en || `Experience gaming like never before with the ${product.name}.`}
           </p>
 
-          {/* Variants Selection */}
           {product.variants && product.variants.length > 0 && (
             <div className="mb-8 border-t border-border-color pt-6">
               <h3 className="text-text-primary font-bold uppercase tracking-wider mb-4 font-mono text-sm">
@@ -213,8 +232,8 @@ export default function ProductPage() {
                       if (variant.image_url) setCurrentDisplayImage(variant.image_url);
                     }}
                     className={`px-4 py-2 border font-mono text-sm transition-all ${
-                      selectedVariant?.id === variant.id 
-                        ? 'border-neon-blue bg-neon-blue/10 text-text-primary' 
+                      selectedVariant?.id === variant.id
+                        ? 'border-neon-blue bg-neon-blue/10 text-text-primary'
                         : 'border-border-color hover:border-text-secondary text-text-secondary hover:text-text-primary bg-bg-secondary'
                     }`}
                   >

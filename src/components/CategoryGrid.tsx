@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { turso } from '../lib/turso';
 
 export default function CategoryGrid() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -10,15 +10,16 @@ export default function CategoryGrid() {
   useEffect(() => {
     const fetchCategoriesData = async () => {
       try {
-        const { data: cats, error: catsError } = await supabase
-          .from('categories')
-          .select('id, name_ar, name_en, image_url');
-        
-        if (catsError) throw catsError;
-
-        if (cats) {
-          setCategories(cats);
-        }
+        const result = await turso.execute(
+          'SELECT id, name_ar, name_en, image_url FROM categories'
+        );
+        const cats = result.rows.map((row: any) => ({
+          id: row[0],
+          name_ar: row[1],
+          name_en: row[2],
+          image_url: row[3],
+        }));
+        setCategories(cats);
       } catch (error) {
         console.error('Error fetching categories for grid:', error);
       } finally {
@@ -60,14 +61,13 @@ export default function CategoryGrid() {
             >
               <Link to={`/products?category=${encodeURIComponent(category.name_en)}`} className="group block relative h-64 overflow-hidden rounded-lg">
                 <div className="absolute inset-0 bg-gray-900">
-                  <img 
-                    src={category.image_url || 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=800&auto=format&fit=crop'} 
+                  <img
+                    src={category.image_url || 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=800&auto=format&fit=crop'}
                     alt={category.name_en}
                     className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-                
                 <div className="absolute bottom-0 left-0 p-4 w-full">
                   <h3 className="text-white font-bold text-lg mb-1 group-hover:text-neon-blue transition-colors">{category.name_ar || category.name_en}</h3>
                 </div>
@@ -75,7 +75,7 @@ export default function CategoryGrid() {
             </motion.div>
           ))}
         </div>
-        
+
         <div className="mt-8 text-center sm:hidden">
           <Link to="/products" className="text-neon-blue hover:text-neon-purple transition-colors font-medium">
             View All Categories →

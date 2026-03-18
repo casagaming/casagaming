@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, Package, Truck, ArrowRight, ShoppingBag } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { turso } from '../lib/turso';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function OrderReceivedPage() {
@@ -18,27 +18,42 @@ export default function OrderReceivedPage() {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('orders')
-          .select(`
-            *,
-            order_items (
-              *,
-              products (
-                name_en,
-                image_url
-              ),
-              product_variants (
-                name_en,
-                image_url
-              )
-            )
-          `)
-          .eq('id', orderId)
-          .single();
+        const orderResult = await turso.execute({
+          sql: 'SELECT * FROM orders WHERE id = ?',
+          args: [orderId],
+        });
 
-        if (error) throw error;
-        setOrder(data);
+        if (orderResult.rows.length === 0) {
+          setLoading(false);
+          return;
+        }
+
+        const orderCols = orderResult.columns;
+        const orderRow = orderResult.rows[0] as any[];
+        const orderObj: any = {};
+        orderCols.forEach((col, i) => { orderObj[col] = orderRow[i]; });
+
+        const itemsResult = await turso.execute({
+          sql: `SELECT oi.id, oi.quantity, oi.price, oi.variant_id,
+                       p.name_en AS product_name, p.image_url AS product_image,
+                       pv.name_en AS variant_name, pv.image_url AS variant_image
+                FROM order_items oi
+                LEFT JOIN products p ON oi.product_id = p.id
+                LEFT JOIN product_variants pv ON oi.variant_id = pv.id
+                WHERE oi.order_id = ?`,
+          args: [orderId],
+        });
+
+        const orderItems = itemsResult.rows.map((row: any) => ({
+          id: row[0],
+          quantity: row[1],
+          price: row[2],
+          variant_id: row[3],
+          products: { name_en: row[4], image_url: row[5] },
+          product_variants: row[3] ? { name_en: row[6], image_url: row[7] } : null,
+        }));
+
+        setOrder({ ...orderObj, order_items: orderItems });
       } catch (err) {
         console.error('Error fetching order details:', err);
       } finally {
@@ -73,34 +88,37 @@ export default function OrderReceivedPage() {
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-text-primary font-display uppercase tracking-tighter mb-4">Order Received!</h1>
         <p className="text-text-secondary text-lg">Thank you for your purchase. Your order is being processed.</p>
-        <p className="text-neon-blue font-mono mt-2 font-bold uppercase tracking-wider">Order ID: #{order.id?.slice(0, 8) || 'N/A'}</p>
+        <p className="text-neon-blue font-mono mt-2 font-bold uppercase tracking-wider">Order ID: #{order.id?.toString().slice(0, 8) || 'N/A'}</p>
       </div>
 
       <div className="bg-bg-secondary p-8 border border-border-color mb-8">
         <h2 className="text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2 flex items-center gap-2">
           <ShoppingBag size={20} className="text-neon-purple" /> Order Summary
         </h2>
-        
+
         <div className="space-y-4 mb-8">
           {order.order_items?.map((item: any) => {
             const images = Array.isArray(item.products?.image_url) ? item.products.image_url : [item.products?.image_url];
             const displayImage = item.product_variants?.image_url || images[0];
             return (
-            <div key={item.id} className="flex items-center gap-4 text-sm font-mono uppercase pb-2 border-b border-border-color last:border-0">
-              {displayImage && (
-                <img 
-                  src={displayImage} 
-                  alt="" 
-                  className="w-12 h-12 object-cover border border-border-color bg-bg-primary" 
-                  style={{ imageRendering: '-webkit-optimize-contrast' }} 
-                />
-              )}
-              <div className="flex-1">
-                <span className="text-text-secondary">{item.products?.name_en || 'Product'} {item.product_variants ? `- ${item.product_variants.name_en}` : ''} x{item.quantity}</span>
+              <div key={item.id} className="flex items-center gap-4 text-sm font-mono uppercase pb-2 border-b border-border-color last:border-0">
+                {displayImage && (
+                  <img
+                    src={displayImage}
+                    alt=""
+                    className="w-12 h-12 object-cover border border-border-color bg-bg-primary"
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                  />
+                )}
+                <div className="flex-1">
+                  <span className="text-text-secondary">
+                    {item.products?.name_en || 'Product'} {item.product_variants ? `- ${item.product_variants.name_en}` : ''} x{item.quantity}
+                  </span>
+                </div>
+                <span className="text-text-primary font-bold">{(item.price * item.quantity)} DA</span>
               </div>
-              <span className="text-text-primary font-bold">{(item.price * item.quantity)} DA</span>
-            </div>
-          )})}
+            );
+          })}
         </div>
 
         <div className="border-t border-border-color pt-6 space-y-3">

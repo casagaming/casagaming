@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { Filter, ChevronDown, Search, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { turso, parseImageUrl } from '../lib/turso';
 
 interface Product {
   id: string;
@@ -23,24 +23,21 @@ export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
   const initialCategory = searchParams.get('category') || 'All';
-  
+
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
   const [dbCategories, setDbCategories] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('name_en')
-          .order('name_en', { ascending: true });
-        
-        if (error) throw error;
-        if (data) setDbCategories(['All', ...data.map((c: any) => c.name_en)]);
+        const result = await turso.execute(
+          'SELECT name_en FROM categories ORDER BY name_en ASC'
+        );
+        const names = result.rows.map((row: any) => row[0] as string);
+        setDbCategories(['All', ...names]);
       } catch (error) {
         console.error('Error fetching categories for filter:', error);
       }
@@ -52,43 +49,40 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        let query = supabase
-          .from('products')
-          .select(`
-            *,
-            categories (
-              name_en
-            )
-          `);
+        const result = await turso.execute(
+          `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
+                  p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count, p.category_id,
+                  c.name_en AS category_name
+           FROM products p
+           LEFT JOIN categories c ON p.category_id = c.id`
+        );
 
-        if (selectedCategory !== 'All') {
-          // This assumes we filter by the category name for now as per the simplified UI
-          query = query.filter('categories.name_en', 'eq', selectedCategory);
-        }
-
-        const { data, error } = await query;
-        
-        if (error) throw error;
-        
-        if (data) {
-          const formattedProducts = data.map((item: any) => {
-            const rawImages = Array.isArray(item.image_url) && item.image_url.length > 0 
-              ? item.image_url 
-              : (Array.isArray(item.images) && item.images.length > 0 ? item.images : [item.image_url || item.images || '']);
-            return {
-              ...item,
-              category: item.categories?.name_en || 'Other',
-              name: item.name_en,
-              image: rawImages[0],
-              hoverImage: rawImages.length > 1 ? rawImages[1] : undefined,
-              images: rawImages,
-              isNew: item.is_new,
-              isSale: item.is_sale,
-              originalPrice: item.original_price
-            };
-          });
-          setProducts(formattedProducts);
-        }
+        const formatted = result.rows.map((row: any) => {
+          const images = parseImageUrl(row[5]);
+          return {
+            id: row[0],
+            name_en: row[1],
+            name_ar: row[2],
+            price: row[3],
+            original_price: row[4],
+            image_url: row[5],
+            is_new: row[6],
+            is_sale: row[7],
+            stock: row[8],
+            rating: row[9],
+            reviews_count: row[10],
+            category_id: row[11],
+            category: row[12] || 'Other',
+            name: row[1],
+            image: images[0],
+            hoverImage: images.length > 1 ? images[1] : undefined,
+            images,
+            isNew: row[6],
+            isSale: row[7],
+            originalPrice: row[4],
+          };
+        });
+        setProducts(formatted);
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -97,7 +91,7 @@ export default function ProductsPage() {
     };
 
     fetchProducts();
-  }, [selectedCategory]);
+  }, []);
 
   useEffect(() => {
     setSearchQuery(searchParams.get('search') || '');
@@ -138,7 +132,6 @@ export default function ProductsPage() {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-          {/* Search Input */}
           <div className="relative w-full sm:w-64">
             <input
               type="text"
@@ -150,7 +143,6 @@ export default function ProductsPage() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
           </div>
 
-          {/* Category Filter */}
           <div className="relative group w-full sm:w-auto">
             <button className="flex items-center justify-between w-full sm:w-auto gap-4 px-6 py-3 border border-border-color bg-bg-secondary text-text-primary hover:border-neon-blue transition-colors font-mono text-sm uppercase tracking-wider">
               <div className="flex items-center gap-2">
@@ -187,11 +179,11 @@ export default function ProductsPage() {
           ))}
         </div>
       )}
-      
+
       {!loading && filteredProducts.length === 0 && (
         <div className="text-center py-20 border border-dashed border-border-color">
           <p className="text-text-secondary text-lg font-mono uppercase mb-4">No products found matching your criteria.</p>
-          <button 
+          <button
             onClick={() => {
               setSelectedCategory('All');
               setSearchQuery('');

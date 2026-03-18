@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { turso } from '../lib/turso';
 
 interface StoreConfig {
   store_name: string;
@@ -28,13 +28,14 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const { data, error } = await supabase
-          .from('store_config')
-          .select('*')
-          .single();
-        
-        if (error) throw error;
-        if (data) setConfig(data);
+        const result = await turso.execute('SELECT * FROM store_config LIMIT 1');
+        if (result.rows.length > 0) {
+          const cols = result.columns;
+          const row = result.rows[0] as any[];
+          const obj: any = {};
+          cols.forEach((col, i) => { obj[col] = row[i]; });
+          setConfig(obj as StoreConfig);
+        }
       } catch (error) {
         console.error('Error fetching store config:', error);
       } finally {

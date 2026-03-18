@@ -5,13 +5,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useConfig } from '../context/ConfigContext';
-import { supabase } from '../lib/supabase';
+import { turso } from '../lib/turso';
 
 interface Category {
   id: string;
   name_en: string;
   name_ar: string;
-  slug: string;
 }
 
 export default function Navbar() {
@@ -27,13 +26,15 @@ export default function Navbar() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('id, name_en, name_ar')
-          .order('name_en', { ascending: true });
-        
-        if (error) throw error;
-        if (data) setCategories(data);
+        const result = await turso.execute(
+          'SELECT id, name_en, name_ar FROM categories ORDER BY name_en ASC'
+        );
+        const cats = result.rows.map((row: any) => ({
+          id: row[0] as string,
+          name_en: row[1] as string,
+          name_ar: row[2] as string,
+        }));
+        setCategories(cats);
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -66,7 +67,6 @@ export default function Navbar() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-bg-primary/90 backdrop-blur-md border-b border-border-color py-4 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            {/* Mobile Menu Button */}
             <button
               className="lg:hidden p-2 text-text-primary hover:text-neon-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(true)}
@@ -74,7 +74,6 @@ export default function Navbar() {
               <Menu size={24} />
             </button>
 
-            {/* Logo */}
             <Link to="/" className="flex-shrink-0 flex items-center gap-2 group">
               {config?.logo_url ? (
                 <img src={config.logo_url} alt={config.store_name} className="h-10 w-auto object-contain" />
@@ -87,7 +86,6 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
               {navLinks.map((link) => (
                 <div key={link.name} className="relative group">
@@ -96,15 +94,13 @@ export default function Navbar() {
                     className="flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors py-2 uppercase tracking-wider font-mono"
                   >
                     {link.name}
-                    {link.hasDropdown && <ChevronDown size={12} className="group-hover:rotate-180 transition-transform duration-200" />}
+                    {(link as any).hasDropdown && <ChevronDown size={12} className="group-hover:rotate-180 transition-transform duration-200" />}
                   </Link>
                 </div>
               ))}
             </div>
 
-            {/* Icons */}
             <div className="flex items-center space-x-6">
-              {/* Search Bar */}
               <div className="relative flex items-center">
                 <AnimatePresence>
                   {isSearchOpen && (
@@ -126,7 +122,7 @@ export default function Navbar() {
                     </motion.form>
                   )}
                 </AnimatePresence>
-                <button 
+                <button
                   onClick={() => setIsSearchOpen(!isSearchOpen)}
                   className={`text-text-secondary hover:text-text-primary transition-colors ${isSearchOpen ? 'text-neon-blue' : ''}`}
                 >
@@ -134,7 +130,6 @@ export default function Navbar() {
                 </button>
               </div>
 
-              {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
                 className="text-text-secondary hover:text-text-primary transition-colors"
@@ -151,7 +146,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>

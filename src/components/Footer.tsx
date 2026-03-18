@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Youtube, Mail, MapPin, Phone } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Phone, Mail, MapPin } from 'lucide-react';
 import { useConfig } from '../context/ConfigContext';
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { turso } from '../lib/turso';
 
 export default function Footer() {
   const { config } = useConfig();
@@ -10,8 +10,12 @@ export default function Footer() {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const { data } = await supabase.from('categories').select('name_en').limit(5);
-      if (data) setCategories(data);
+      try {
+        const result = await turso.execute('SELECT name_en FROM categories LIMIT 5');
+        setCategories(result.rows.map((row: any) => ({ name_en: row[0] as string })));
+      } catch (error) {
+        console.error('Error fetching categories for footer:', error);
+      }
     };
     fetchCategories();
   }, []);
@@ -20,14 +24,13 @@ export default function Footer() {
     <footer className="bg-bg-primary border-t border-border-color pt-16 pb-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          {/* Brand Column */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-6">
               <div className="relative w-8 h-8 flex items-center justify-center">
-                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full text-neon-blue">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <path d="M9 22V12h6v10" />
-                 </svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full text-neon-blue">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <path d="M9 22V12h6v10" />
+                </svg>
               </div>
               <span className="font-display font-bold text-xl tracking-wider">
                 <span className="text-neon-blue">CASA</span>
@@ -61,7 +64,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Shop Links */}
           <div>
             <h3 className="font-bold text-text-primary text-lg mb-6">Shop</h3>
             <ul className="space-y-3 text-sm text-text-secondary">
@@ -76,7 +78,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Support Links */}
           <div>
             <h3 className="font-bold text-text-primary text-lg mb-6">Support</h3>
             <ul className="space-y-3 text-sm text-text-secondary">
@@ -89,7 +90,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h3 className="font-bold text-text-primary text-lg mb-6">Contact</h3>
             <ul className="space-y-4 text-sm text-text-secondary">
