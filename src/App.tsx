@@ -5,6 +5,9 @@ import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ScrollToTop from './components/ScrollToTop';
 import { LanguageProvider } from './context/LanguageContext';
+import { ConfigProvider } from './context/ConfigContext';
+import { ToastProvider } from './context/ToastContext';
+import { CartProvider } from './context/CartContext';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CatalogPage = lazy(() => import('./pages/CatalogPage'));
