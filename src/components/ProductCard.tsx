@@ -78,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Content */}
-        <div className="p-3 md:p-4">
+        <div className="p-3 md:p-4 flex flex-col h-full">
           <div className="flex justify-between items-start mb-2">
             <div className="text-[10px] md:text-xs text-text-secondary uppercase tracking-wider font-mono">
               {categoryName}
@@ -90,11 +90,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             )}
           </div>
           
-          <h3 className="text-sm md:text-base font-bold text-text-primary mb-2 md:mb-3 line-clamp-2 group-hover:text-neon-blue transition-colors font-display uppercase tracking-wide">
+          <h3 className="text-sm md:text-base font-bold text-text-primary mb-3 line-clamp-2 group-hover:text-neon-blue transition-colors font-display uppercase tracking-wide min-h-[2.5rem]">
             {productName}
           </h3>
           
-          <div className="flex items-center justify-between mt-2">
+          <div className="mt-auto pt-3 border-t border-border-color/50 flex flex-col gap-3">
             <div className={`flex items-center gap-1.5 md:gap-2 font-mono ${isRTL ? 'flex-row-reverse' : ''}`}>
               <span className="text-base md:text-lg font-bold text-text-primary">{Math.round(product.price * 200)} {t('product.currency')}</span>
               {product.originalPrice && (
@@ -105,7 +105,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <button 
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className="text-[10px] md:text-xs uppercase font-bold tracking-wider border-b border-text-primary pb-0.5 text-text-primary hover:text-neon-blue hover:border-neon-blue transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-mono whitespace-nowrap"
+              className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-mono flex items-center justify-center gap-2
+                ${product.variants_count > 0 
+                  ? 'bg-transparent border border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black' 
+                  : 'bg-neon-blue text-black hover:bg-neon-blue/80 shadow-[0_0_10px_rgba(0,243,255,0.2)] hover:shadow-[0_0_20px_rgba(0,243,255,0.4)]'
+                }`}
             >
               {isOutOfStock 
                 ? (language === 'ar' ? 'نفذ' : 'Sold Out') 

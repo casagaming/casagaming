@@ -31,16 +31,22 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           <div>
             <Link to="/" className="flex items-center gap-2 mb-6">
-              <div className="relative w-8 h-8 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full text-neon-blue">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <path d="M9 22V12h6v10" />
-                </svg>
-              </div>
-              <span className="font-display font-bold text-xl tracking-wider">
-                <span className="text-neon-blue">CASA</span>
-                <span className="text-neon-purple ml-1">GAMING</span>
-              </span>
+              {config?.logo_url ? (
+                <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-10 w-auto object-contain" />
+              ) : (
+                <>
+                  <div className="relative w-8 h-8 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-full h-full text-neon-blue">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <path d="M9 22V12h6v10" />
+                    </svg>
+                  </div>
+                  <span className="font-display font-bold text-xl tracking-wider">
+                    <span className="text-neon-blue">CASA</span>
+                    <span className="text-neon-purple ml-1">GAMING</span>
+                  </span>
+                </>
+              )}
             </Link>
             <p className="text-text-secondary text-sm leading-relaxed mb-6">
               {language === 'ar' 
@@ -86,14 +92,11 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-text-primary text-lg mb-6">{t('footer.support')}</h3>
+            <h3 className="font-bold text-text-primary text-lg mb-6">{language === 'ar' ? 'معلومات' : 'Informations'}</h3>
             <ul className="space-y-3 text-sm text-text-secondary">
-              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.help_center')}</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.shipping_returns')}</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.warranty')}</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.track_order')}</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.contact_us')}</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.faq')}</a></li>
+              <li><Link to="/about" className="hover:text-neon-blue transition-colors">{t('footer.about')}</Link></li>
+              <li><Link to="/products" className="hover:text-neon-blue transition-colors">{t('footer.all_products')}</Link></li>
+              <li><Link to="/categories" className="hover:text-neon-blue transition-colors">{t('nav.categories')}</Link></li>
             </ul>
           </div>
 
@@ -104,13 +107,22 @@ export default function Footer() {
                 <MapPin size={18} className="text-neon-purple flex-shrink-0 mt-0.5" />
                 <span>{config?.contact_address || 'Algiers, Algeria'}</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone size={18} className="text-neon-purple flex-shrink-0" />
-                <span>{config?.contact_phone || '+213 555 123 456'}</span>
+              <li className="flex items-center gap-3 group">
+                <Phone size={18} className="text-neon-purple flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <a 
+                  href={`https://wa.me/${config?.whatsapp_number}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-neon-blue transition-colors"
+                >
+                  {config?.contact_phone || '+213 555 123 456'}
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-neon-purple flex-shrink-0" />
-                <span>{config?.contact_email || 'support@casagaming.dz'}</span>
+                <a href={`mailto:${config?.contact_email || 'support@casagaming.dz'}`} className="hover:text-neon-blue transition-colors">
+                  {config?.contact_email || 'support@casagaming.dz'}
+                </a>
               </li>
             </ul>
           </div>
