@@ -167,33 +167,18 @@ export default function ProductPage() {
         {/* Product Images Section */}
         <div className="space-y-4">
           <div className="bg-bg-secondary border border-border-color overflow-hidden aspect-square relative group">
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <motion.img
                 key={currentDisplayImage || activeImageIndex}
                 src={getHighQualityUrl(currentDisplayImage || product.images[activeImageIndex])}
                 alt={product.name}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
                 className={`w-full h-full object-cover ${isOutOfStock ? 'grayscale opacity-50' : ''}`}
               />
             </AnimatePresence>
-            
-            {/* Dots for mobile */}
-            {product.images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:hidden">
-                {product.images.map((_: any, idx: number) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveImageIndex(idx)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      activeImageIndex === idx ? 'bg-neon-blue w-4' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
 
             {product.isSale && (
               <span className={`absolute top-6 ${isRTL ? 'right-6' : 'left-6'} px-3 py-1 bg-neon-purple text-white font-bold uppercase tracking-wider text-sm`}>
@@ -205,6 +190,22 @@ export default function ProductPage() {
                 {t('product.out_of_stock')}
               </span>
             )}
+          </div>
+
+          {/* Dots for mobile - Moved below image */}
+          {product.images.length > 1 && (
+            <div className="flex justify-center gap-2 sm:hidden py-4">
+              {product.images.map((_: any, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all border border-border-color ${
+                    activeImageIndex === idx ? 'bg-neon-blue w-6 border-neon-blue' : 'bg-bg-secondary'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
           </div>
 
           {/* Thumbnails for desktop */}
