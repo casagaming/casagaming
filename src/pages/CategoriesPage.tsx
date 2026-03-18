@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import { turso } from '../lib/turso';
 
 interface Category {
@@ -13,6 +14,7 @@ interface Category {
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const { language, t, isRTL } = useLanguage();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -49,14 +51,14 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="pt-32 pb-20 px-4 bg-bg-primary min-h-screen">
+    <div className={`pt-32 pb-20 px-4 bg-bg-primary min-h-screen ${isRTL ? 'text-right' : 'text-left'}`}>
       <div className="max-w-[1600px] mx-auto">
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-7xl font-bold text-text-primary mb-6 font-display uppercase tracking-tighter">
-            All Categories
+            {t('categories.title')}
           </h1>
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Explore our complete collection of premium gaming gear, meticulously organized for your perfect setup.
+            {t('categories.desc')}
           </p>
         </div>
 
@@ -80,21 +82,23 @@ export default function CategoriesPage() {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40" />
-                    <div className="absolute bottom-8 left-8">
-                      <h3 className="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tighter">{category.name_ar || category.name_en}</h3>
+                    <div className={`absolute bottom-8 ${isRTL ? 'right-8' : 'left-8'}`}>
+                      <h3 className="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tighter">
+                        {language === 'ar' ? category.name_ar : category.name_en}
+                      </h3>
                     </div>
                   </div>
 
                   <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-6 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:-translate-y-3 group-hover:-translate-x-3 ${style.bg} border-2 ${style.accent}`}>
                     <h3 className={`text-3xl md:text-4xl font-display font-black uppercase tracking-tighter mb-4 ${style.text} leading-[0.9]`}>
-                      {category.name_ar || category.name_en}
+                      {language === 'ar' ? category.name_ar : category.name_en}
                     </h3>
                     <div className="absolute bottom-8 left-0 right-0 flex justify-center">
                       <Link
                         to={`/products?category=${encodeURIComponent(category.name_en)}`}
                         className={`inline-flex items-center gap-2 px-6 py-3 text-sm rounded-full font-bold uppercase tracking-wider transition-transform hover:scale-105 ${style.btnBg} ${style.btnText}`}
                       >
-                        View Products <ArrowRight size={16} />
+                        {language === 'ar' ? 'عرض المنتجات' : 'Voir les produits'} <ArrowRight size={16} className={isRTL ? 'rotate-180' : ''} />
                       </Link>
                     </div>
                   </div>

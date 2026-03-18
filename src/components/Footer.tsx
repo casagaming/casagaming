@@ -1,18 +1,23 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Phone, Mail, MapPin } from 'lucide-react';
 import { useConfig } from '../context/ConfigContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useState, useEffect } from 'react';
 import { turso } from '../lib/turso';
 
 export default function Footer() {
   const { config } = useConfig();
+  const { language, t, isRTL } = useLanguage();
   const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const result = await turso.execute('SELECT name_en FROM categories LIMIT 5');
-        setCategories(result.rows.map((row: any) => ({ name_en: row[0] as string })));
+        const result = await turso.execute('SELECT name_en, name_ar FROM categories LIMIT 5');
+        setCategories(result.rows.map((row: any) => ({ 
+          name_en: row[0] as string,
+          name_ar: row[1] as string 
+        })));
       } catch (error) {
         console.error('Error fetching categories for footer:', error);
       }
@@ -38,7 +43,9 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-text-secondary text-sm leading-relaxed mb-6">
-              Premium gaming gear for the ultimate setup. Elevate your gameplay with our high-performance peripherals and accessories.
+              {language === 'ar' 
+                ? 'معدات ألعاب متميزة للإعداد المثالي. ارتقِ بلعبك من خلال ملحقاتنا وإكسسواراتنا عالية الأداء.'
+                : 'Équipement de jeu haut de gamme pour une configuration ultime. Améliorez votre gameplay avec nos périphériques et accessoires haute performance.'}
             </p>
             <div className="flex gap-4">
               {config?.facebook_url && (
@@ -65,33 +72,33 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-bold text-text-primary text-lg mb-6">Shop</h3>
+            <h3 className="font-bold text-text-primary text-lg mb-6">{t('footer.shop')}</h3>
             <ul className="space-y-3 text-sm text-text-secondary">
               {categories.map(cat => (
                 <li key={cat.name_en}>
                   <Link to={`/products?category=${encodeURIComponent(cat.name_en)}`} className="hover:text-neon-blue transition-colors">
-                    {cat.name_en}
+                    {language === 'ar' ? cat.name_ar : cat.name_en}
                   </Link>
                 </li>
               ))}
-              <li><Link to="/products" className="hover:text-neon-blue transition-colors">All Products</Link></li>
+              <li><Link to="/products" className="hover:text-neon-blue transition-colors">{t('footer.all_products')}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-bold text-text-primary text-lg mb-6">Support</h3>
+            <h3 className="font-bold text-text-primary text-lg mb-6">{t('footer.support')}</h3>
             <ul className="space-y-3 text-sm text-text-secondary">
-              <li><a href="#" className="hover:text-neon-blue transition-colors">Help Center</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">Shipping & Returns</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">Warranty Info</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">Track Order</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">Contact Us</a></li>
-              <li><a href="#" className="hover:text-neon-blue transition-colors">FAQ</a></li>
+              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.help_center')}</a></li>
+              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.shipping_returns')}</a></li>
+              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.warranty')}</a></li>
+              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.track_order')}</a></li>
+              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.contact_us')}</a></li>
+              <li><a href="#" className="hover:text-neon-blue transition-colors">{t('footer.faq')}</a></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-bold text-text-primary text-lg mb-6">Contact</h3>
+            <h3 className="font-bold text-text-primary text-lg mb-6">{t('footer.contact')}</h3>
             <ul className="space-y-4 text-sm text-text-secondary">
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-neon-purple flex-shrink-0 mt-0.5" />
@@ -111,11 +118,11 @@ export default function Footer() {
 
         <div className="border-t border-border-color pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-text-secondary text-sm">
-            &copy; {new Date().getFullYear()} Casa Gaming. All rights reserved.
+            &copy; {new Date().getFullYear()} Casa Gaming. {t('footer.rights')}
           </p>
           <div className="flex gap-6 text-sm text-text-secondary">
-            <a href="#" className="hover:text-text-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-text-primary transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-text-primary transition-colors">{t('footer.privacy')}</a>
+            <a href="#" className="hover:text-text-primary transition-colors">{t('footer.terms')}</a>
           </div>
         </div>
       </div>

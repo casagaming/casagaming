@@ -1,6 +1,7 @@
 import { Product } from '../data';
 import ProductCard from './ProductCard';
 import { ArrowRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ProductGridProps {
   title: string;
@@ -9,7 +10,11 @@ interface ProductGridProps {
   linkHref?: string;
 }
 
-export default function ProductGrid({ title, products, linkText = "View All", linkHref = "#" }: ProductGridProps) {
+export default function ProductGrid({ title, products, linkText, linkHref = "#" }: ProductGridProps) {
+  const { language, t, isRTL } = useLanguage();
+  const defaultLinkText = language === 'ar' ? 'عرض الكل' : 'Voir tout';
+  const effectiveLinkText = linkText || defaultLinkText;
+
   return (
     <section className="py-8 md:py-20 px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto border-t border-border-color transition-colors duration-300">
       <div className="flex items-end justify-between mb-6 md:mb-12">
@@ -23,7 +28,7 @@ export default function ProductGrid({ title, products, linkText = "View All", li
           href={linkHref} 
           className="hidden sm:flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-sm font-bold uppercase tracking-widest font-mono group"
         >
-          {linkText} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          {effectiveLinkText} <ArrowRight size={16} className={`${isRTL ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'} transition-transform`} />
         </a>
       </div>
 
@@ -38,7 +43,7 @@ export default function ProductGrid({ title, products, linkText = "View All", li
           href={linkHref} 
           className="inline-block px-8 py-3 border border-border-color text-sm font-bold text-text-primary uppercase tracking-widest hover:bg-text-primary hover:text-bg-primary transition-colors"
         >
-          {linkText}
+          {effectiveLinkText}
         </a>
       </div>
     </section>

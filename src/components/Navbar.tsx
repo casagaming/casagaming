@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useConfig } from '../context/ConfigContext';
+import { useLanguage } from '../context/LanguageContext';
 import { turso } from '../lib/turso';
 
 interface Category {
@@ -21,6 +22,7 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const { theme, toggleTheme } = useTheme();
   const { config } = useConfig();
+  const { language, setLanguage, t, isRTL } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,11 +46,11 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Products', href: '/products' },
-    { name: 'Categories', href: '/categories' },
+    { name: t('nav.home'), href: '/' },
+    { name: t('nav.products'), href: '/products' },
+    { name: t('nav.categories'), href: '/categories' },
     ...categories.slice(0, 5).map(cat => ({
-      name: cat.name_en,
+      name: language === 'ar' ? cat.name_ar : cat.name_en,
       href: `/products?category=${encodeURIComponent(cat.name_en)}`,
     })),
   ];
@@ -113,7 +115,7 @@ export default function Navbar() {
                     >
                       <input
                         type="text"
-                        placeholder="SEARCH..."
+                        placeholder={t('nav.search')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-transparent border-b border-border-color py-1 px-0 text-sm text-text-primary focus:outline-none focus:border-neon-blue font-mono uppercase placeholder:text-text-secondary"
@@ -133,8 +135,16 @@ export default function Navbar() {
               <button
                 onClick={toggleTheme}
                 className="text-text-secondary hover:text-text-primary transition-colors"
+                title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+
+              <button
+                onClick={() => setLanguage(language === 'fr' ? 'ar' : 'fr')}
+                className="text-text-secondary hover:text-text-primary transition-colors font-mono font-bold text-sm border border-border-color px-2 py-0.5 rounded hover:border-neon-blue"
+              >
+                {language === 'fr' ? 'AR' : 'FR'}
               </button>
 
               <Link to="/cart" className="relative text-text-secondary hover:text-text-primary transition-colors group flex items-center gap-2">
@@ -157,11 +167,11 @@ export default function Navbar() {
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden"
             />
             <motion.div
-              initial={{ x: '-100%' }}
+               initial={{ x: isRTL ? '100%' : '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
+              exit={{ x: isRTL ? '100%' : '-100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 left-0 bottom-0 w-full max-w-xs bg-bg-primary border-r border-border-color z-50 lg:hidden overflow-y-auto"
+              className={`fixed top-0 bottom-0 w-full max-w-xs bg-bg-primary z-50 lg:hidden overflow-y-auto ${isRTL ? 'right-0 border-l' : 'left-0 border-r'} border-border-color`}
             >
               <div className="p-6 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-12">
@@ -182,10 +192,10 @@ export default function Navbar() {
                     </Link>
                   ))}
                 </div>
-                <div className="mt-auto pt-8 border-t border-border-color">
-                  <div className="flex flex-col gap-4 font-mono text-sm text-text-secondary">
-                    <a href="#" className="hover:text-text-primary">ACCOUNT</a>
-                    <a href="#" className="hover:text-text-primary">WISHLIST</a>
+                 <div className="mt-auto pt-8 border-t border-border-color">
+                  <div className={`flex flex-col gap-4 font-mono text-sm text-text-secondary ${isRTL ? 'items-end' : 'items-start'}`}>
+                    <a href="#" className="hover:text-text-primary">{language === 'ar' ? 'الحساب' : 'COMPTE'}</a>
+                    <a href="#" className="hover:text-text-primary">{language === 'ar' ? 'قائمة الأمنيات' : 'LISTE DE SOUHAITS'}</a>
                   </div>
                 </div>
               </div>

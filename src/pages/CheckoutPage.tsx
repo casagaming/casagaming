@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, CreditCard, Lock, MapPin, Truck, Search, ChevronDown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { turso } from '../lib/turso';
 
 export default function CheckoutPage() {
   const { items, cartTotal, clearCart } = useCart();
+  const { language, t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [shippingMethod, setShippingMethod] = useState<'home' | 'desk'>('home');
   const [wilayas, setWilayas] = useState<any[]>([]);
@@ -58,18 +60,18 @@ export default function CheckoutPage() {
     setError(null);
 
     if (firstName.length > 20 || lastName.length > 20) {
-      setError('First name and last name must be 20 characters or less.');
+      setError(language === 'ar' ? 'الاسم واللقب يجب أن لا يتجاوزا 20 حرفاً.' : 'Le prénom et le nom doivent comporter 20 caractères ou moins.');
       return;
     }
 
     const phoneRegex = /^(05|06|07)\d{8}$/;
     if (!phoneRegex.test(phone)) {
-      setError('Phone number must be 10 digits and start with 05, 06, or 07.');
+      setError(language === 'ar' ? 'رقم الهاتف يجب أن يتكون من 10 أرقام ويبدأ بـ 05 أو 06 أو 07.' : 'Le numéro de téléphone doit comporter 10 chiffres et commencer par 05, 06 ou 07.');
       return;
     }
 
     if (!firstName || !lastName || !phone || !municipality || (shippingMethod === 'home' && !address)) {
-      setError('Please fill in all required fields.');
+      setError(language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة.' : 'Veuillez remplir tous les champs obligatoires.');
       return;
     }
 
@@ -106,7 +108,7 @@ export default function CheckoutPage() {
       navigate(`/order-received?order_id=${orderId}`);
     } catch (error: any) {
       console.error('Error submitting order:', error);
-      setError('Failed to submit order. Please try again.');
+      setError(language === 'ar' ? 'فشل إرسال الطلب. يرجى المحاولة مرة أخرى.' : 'Échec de la soumission de la commande. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);
     }
@@ -115,19 +117,19 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="pt-32 pb-20 text-center min-h-[60vh] flex flex-col justify-center items-center">
-        <h2 className="text-4xl font-bold text-text-primary font-display uppercase tracking-tighter mb-6">Your cart is empty</h2>
+        <h2 className="text-4xl font-bold text-text-primary font-display uppercase tracking-tighter mb-6">{t('cart.empty')}</h2>
         <Link to="/products" className="text-neon-blue hover:text-text-primary font-mono uppercase tracking-widest border-b border-neon-blue hover:border-text-primary transition-all pb-1">
-          Start Shopping
+          {language === 'ar' ? 'ابدأ التسوق' : 'Commencer les achats'}
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300">
+    <div className={`pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <form onSubmit={handleConfirmOrder}>
-          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-12 font-display uppercase tracking-tighter">Checkout</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-12 font-display uppercase tracking-tighter">{t('checkout.title')}</h1>
 
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500 text-red-500 font-mono text-sm uppercase">
@@ -136,11 +138,11 @@ export default function CheckoutPage() {
           )}
 
           <div className="mb-12">
-            <h2 className="text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2">Contact Information</h2>
+            <h2 className={`text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2 ${isRTL ? 'text-right' : ''}`}>{t('checkout.contact_info')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <input
                 type="text"
-                placeholder="FIRST NAME"
+                placeholder={t('checkout.first_name')}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value.slice(0, 20))}
                 className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase"
@@ -148,7 +150,7 @@ export default function CheckoutPage() {
               />
               <input
                 type="text"
-                placeholder="LAST NAME"
+                placeholder={t('checkout.last_name')}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value.slice(0, 20))}
                 className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase"
@@ -156,7 +158,7 @@ export default function CheckoutPage() {
               />
               <input
                 type="tel"
-                placeholder="PHONE NUMBER (e.g. 05XXXXXXXX)"
+                placeholder={`${t('checkout.phone')} (e.g. 05XXXXXXXX)`}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue md:col-span-2 font-mono text-base uppercase"
@@ -166,16 +168,16 @@ export default function CheckoutPage() {
           </div>
 
           <div className="mb-12">
-            <h2 className="text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2">Shipping Details</h2>
+            <h2 className="text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2">{t('checkout.shipping_details')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="md:col-span-2 relative">
-                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">Wilaya (State)</label>
+              <div className="md:col-span-2 relative text-left" dir="ltr">
+                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.wilaya')} (State)</label>
                 <div
                   className="w-full p-4 bg-white border border-border-color text-black flex items-center justify-between cursor-pointer font-mono text-base uppercase"
                   onClick={() => setIsWilayaDropdownOpen(!isWilayaDropdownOpen)}
                 >
                   <span>
-                    {selectedWilaya} - {wilayas.find(w => w.wilaya_id === selectedWilaya)?.wilaya_name_en || 'Select Wilaya'}
+                    {selectedWilaya} - {wilayas.find(w => w.wilaya_id === selectedWilaya)?.wilaya_name_en || (language === 'ar' ? 'اختر الولاية' : 'Sélectionner la Wilaya')}
                   </span>
                   <ChevronDown size={16} className={`transition-transform ${isWilayaDropdownOpen ? 'rotate-180' : ''}`} />
                 </div>
@@ -219,10 +221,10 @@ export default function CheckoutPage() {
                 )}
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">Baladiya (Municipality)</label>
+                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.commune')} (Municipality)</label>
                 <input
                   type="text"
-                  placeholder="ENTER YOUR MUNICIPALITY"
+                  placeholder={language === 'ar' ? 'أدخل بلديتك' : 'ENTRER VOTRE COMMUNE'}
                   value={municipality}
                   onChange={(e) => setMunicipality(e.target.value)}
                   className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase"
@@ -232,7 +234,7 @@ export default function CheckoutPage() {
             </div>
 
             <div className="space-y-4 mb-8">
-              <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">Delivery Method</label>
+              <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.delivery_method')}</label>
 
               <div
                 className={`border p-6 flex items-center justify-between cursor-pointer transition-all group ${shippingMethod === 'home' ? 'border-neon-blue bg-neon-blue/5' : 'border-border-color hover:border-text-primary/30 bg-bg-secondary'}`}
@@ -244,10 +246,10 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <MapPin size={20} className={shippingMethod === 'home' ? 'text-neon-blue' : 'text-text-secondary'} />
-                    <span className={`font-bold uppercase tracking-wider ${shippingMethod === 'home' ? 'text-text-primary' : 'text-text-secondary'}`}>Home Delivery</span>
+                    <span className={`font-bold uppercase tracking-wider ${shippingMethod === 'home' ? 'text-text-primary' : 'text-text-secondary'}`}>{t('checkout.home_delivery')}</span>
                   </div>
                 </div>
-                <span className="font-bold text-text-primary font-mono">{wilayas.find(w => w.wilaya_id === selectedWilaya)?.home_delivery_price} DZD</span>
+                <span className="font-bold text-text-primary font-mono">{wilayas.find(w => w.wilaya_id === selectedWilaya)?.home_delivery_price} {t('product.currency')}</span>
               </div>
 
               <div
@@ -260,18 +262,18 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Truck size={20} className={shippingMethod === 'desk' ? 'text-neon-blue' : 'text-text-secondary'} />
-                    <span className={`font-bold uppercase tracking-wider ${shippingMethod === 'desk' ? 'text-text-primary' : 'text-text-secondary'}`}>Stop Desk</span>
+                    <span className={`font-bold uppercase tracking-wider ${shippingMethod === 'desk' ? 'text-text-primary' : 'text-text-secondary'}`}>{t('checkout.stop_desk')}</span>
                   </div>
                 </div>
-                <span className="font-bold text-text-primary font-mono">{wilayas.find(w => w.wilaya_id === selectedWilaya)?.desk_delivery_price} DZD</span>
+                <span className="font-bold text-text-primary font-mono">{wilayas.find(w => w.wilaya_id === selectedWilaya)?.desk_delivery_price} {t('product.currency')}</span>
               </div>
             </div>
 
             {shippingMethod === 'home' && (
               <div className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">Home Address</label>
+                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.address')}</label>
                 <textarea
-                  placeholder="ENTER YOUR FULL HOME ADDRESS"
+                  placeholder={language === 'ar' ? 'أدخل عنوانك الكامل بالتفصيل' : 'ENTRER VOTRE ADRESSE COMPLÈTE'}
                   rows={3}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
@@ -287,13 +289,13 @@ export default function CheckoutPage() {
             disabled={isSubmitting}
             className="w-full bg-text-primary text-bg-primary py-5 font-bold uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] text-lg mt-4 group flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Processing...' : 'Confirm Order'} <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            {isSubmitting ? t('checkout.processing') : t('checkout.confirm')} <ArrowRight className={`transition-transform ${isRTL ? 'rotate-180 group-hover:-translate-x-1' : 'group-hover:translate-x-1'}`} />
           </button>
         </form>
 
         <div>
           <div className="bg-bg-secondary p-8 border border-border-color sticky top-32">
-            <h2 className="text-xl font-bold text-text-primary mb-8 font-display uppercase tracking-wider border-b border-border-color pb-4">Order Summary</h2>
+            <h2 className="text-xl font-bold text-text-primary mb-8 font-display uppercase tracking-wider border-b border-border-color pb-4">{t('checkout.summary')}</h2>
 
             <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {items.map((item) => (
@@ -304,9 +306,12 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-text-primary text-sm truncate font-display uppercase tracking-wide">
-                      {(item as any).name} {(item as any).selectedVariant ? `- ${(item as any).selectedVariant.name_en}` : ''}
+                      {language === 'ar' ? ((item as any).name_ar || (item as any).name) : ((item as any).name_en || (item as any).name)} 
+                      {(item as any).selectedVariant ? ` - ${language === 'ar' ? ((item as any).selectedVariant.name_ar || (item as any).selectedVariant.name_en) : (item as any).selectedVariant.name_en}` : ''}
                     </h4>
-                    <p className="text-xs text-text-secondary font-mono uppercase">{(item as any).category}</p>
+                    <p className="text-xs text-text-secondary font-mono uppercase">
+                      {language === 'ar' ? ((item as any).category_ar || (item as any).category) : ((item as any).category_en || (item as any).category)}
+                    </p>
                   </div>
                   <span className="font-bold text-text-primary whitespace-nowrap font-mono">${(item.price * item.quantity).toFixed(2)}</span>
                 </div>
@@ -315,18 +320,18 @@ export default function CheckoutPage() {
 
             <div className="border-t border-border-color pt-6 space-y-4">
               <div className="flex justify-between text-text-secondary font-mono text-sm">
-                <span>Subtotal</span>
-                <span className="font-bold text-text-primary">{cartTotal * 200} DA</span>
+                <span>{t('cart.subtotal')}</span>
+                <span className="font-bold text-text-primary">{cartTotal * 200} {t('product.currency')}</span>
               </div>
               <div className="flex justify-between text-text-secondary font-mono text-sm">
-                <span>Shipping ({shippingMethod === 'home' ? 'Home' : 'Desk'})</span>
-                <span className="font-bold text-text-primary">{shippingCost} DZD</span>
+                <span>{t('checkout.shipping_cost')} ({shippingMethod === 'home' ? t('checkout.home_delivery') : t('checkout.stop_desk')})</span>
+                <span className="font-bold text-text-primary">{shippingCost} {t('product.currency')}</span>
               </div>
               <div className="border-t border-border-color pt-6 flex justify-between text-xl font-bold text-text-primary font-display uppercase tracking-wider">
-                <span>Total</span>
+                <span>{t('checkout.total')}</span>
                 <div className="text-right">
-                  <span className="block text-xs text-text-secondary font-normal font-mono mb-1">APPROX.</span>
-                  <span>{(cartTotal * 200) + shippingCost} DA</span>
+                  <span className="block text-xs text-text-secondary font-normal font-mono mb-1">{language === 'ar' ? 'تقريباً' : 'APPROX.'}</span>
+                  <span>{(cartTotal * 200) + shippingCost} {t('product.currency')}</span>
                 </div>
               </div>
             </div>

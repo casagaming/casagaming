@@ -5,11 +5,13 @@ import Marquee from '../components/Marquee';
 import CategoryShowcase from '../components/CategoryShowcase';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Truck, Zap } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import { turso, parseImageUrl } from '../lib/turso';
 
 export default function HomePage() {
   const [newArrivals, setNewArrivals] = useState<any[]>([]);
   const [popularProducts, setPopularProducts] = useState<any[]>([]);
+  const { language, t, isRTL } = useLanguage();
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -17,14 +19,15 @@ export default function HomePage() {
         const newResult = await turso.execute(
           `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                   p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
-                  c.name_en AS category_name
+                  c.name_en AS category_name_en, c.name_ar AS category_name_ar,
+                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
            FROM products p
            LEFT JOIN categories c ON p.category_id = c.id
            WHERE p.is_new = 1
            LIMIT 6`
         );
 
-        setNewArrivals(newResult.rows.map((row: any) => {
+        setNewArrivals(newResult.rows.filter((row: any) => row[6] === 1).slice(0, 6).map((row: any) => {
           const images = parseImageUrl(row[5]);
           return {
             id: row[0],
@@ -38,21 +41,24 @@ export default function HomePage() {
             stock: row[8],
             rating: row[9],
             reviews_count: row[10],
-            category: row[11] || 'Gear',
-            name: row[1],
+            category_en: row[11] || 'Gear',
+            category_ar: row[12] || 'معدات',
+            name: language === 'ar' ? row[2] : row[1],
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,
             images,
             isNew: row[6],
             isSale: row[7],
             originalPrice: row[4],
+            variants_count: row[13],
           };
         }));
 
         const popResult = await turso.execute(
           `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                   p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
-                  c.name_en AS category_name
+                  c.name_en AS category_name_en, c.name_ar AS category_name_ar,
+                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
            FROM products p
            LEFT JOIN categories c ON p.category_id = c.id
            ORDER BY p.reviews_count DESC
@@ -73,14 +79,16 @@ export default function HomePage() {
             stock: row[8],
             rating: row[9],
             reviews_count: row[10],
-            category: row[11] || 'Gear',
-            name: row[1],
+            category_en: row[11] || 'Gear',
+            category_ar: row[12] || 'معدات',
+            name: language === 'ar' ? row[2] : row[1],
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,
             images,
             isNew: row[6],
             isSale: row[7],
             originalPrice: row[4],
+            variants_count: row[13],
           };
         }));
       } catch (error) {
@@ -97,13 +105,13 @@ export default function HomePage() {
       <Marquee />
 
       <ProductGrid
-        title="New Arrivals"
+        title={language === 'ar' ? 'وصل حديثاً' : 'Nouveautés'}
         products={newArrivals}
         linkHref="/products"
       />
 
       <ProductGrid
-        title="Popular Gear"
+        title={language === 'ar' ? 'الأكثر شعبية' : 'Produits Populaires'}
         products={popularProducts}
         linkHref="/products"
       />
@@ -117,24 +125,36 @@ export default function HomePage() {
               <div className="w-16 h-16 mx-auto bg-bg-secondary border border-border-color flex items-center justify-center mb-8 text-neon-blue group-hover:scale-110 transition-transform duration-300">
                 <ShieldCheck size={32} strokeWidth={1.5} />
               </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-4 font-display uppercase tracking-wider">Premium Quality</h3>
-              <p className="text-text-secondary font-light leading-relaxed">Built with aerospace-grade materials for durability and performance.</p>
+              <h3 className="text-2xl font-bold text-text-primary mb-4 font-display uppercase tracking-wider">
+                {language === 'ar' ? 'جودة ممتازة' : 'Qualité Premium'}
+              </h3>
+              <p className="text-text-secondary font-light leading-relaxed">
+                {language === 'ar' ? 'مصنوع من مواد عالية الجودة للمتانة والأداء.' : 'Fabriqué avec des matériaux de qualité aérospatiale pour la durabilité et la performance.'}
+              </p>
             </div>
 
             <div className="p-8 border border-border-color hover:border-neon-purple/30 transition-colors group bg-bg-primary">
               <div className="w-16 h-16 mx-auto bg-bg-secondary border border-border-color flex items-center justify-center mb-8 text-neon-purple group-hover:scale-110 transition-transform duration-300">
                 <Truck size={32} strokeWidth={1.5} />
               </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-4 font-display uppercase tracking-wider">Fast Shipping</h3>
-              <p className="text-text-secondary font-light leading-relaxed">Same-day dispatch on orders before 2PM. Global shipping available.</p>
+              <h3 className="text-2xl font-bold text-text-primary mb-4 font-display uppercase tracking-wider">
+                {t('product.free_shipping')}
+              </h3>
+              <p className="text-text-secondary font-light leading-relaxed">
+                {language === 'ar' ? 'شحن سريع لجميع الولايات. توصيل في وقت قياسي.' : 'Expédition le jour même pour les commandes passées avant 14h. Livraison mondiale disponible.'}
+              </p>
             </div>
 
             <div className="p-8 border border-border-color hover:border-neon-blue/30 transition-colors group bg-bg-primary">
               <div className="w-16 h-16 mx-auto bg-bg-secondary border border-border-color flex items-center justify-center mb-8 text-neon-blue group-hover:scale-110 transition-transform duration-300">
                 <Zap size={32} strokeWidth={1.5} />
               </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-4 font-display uppercase tracking-wider">2-Year Warranty</h3>
-              <p className="text-text-secondary font-light leading-relaxed">We stand by our gear. Comprehensive warranty on all mechanical keyboards.</p>
+              <h3 className="text-2xl font-bold text-text-primary mb-4 font-display uppercase tracking-wider">
+                {t('product.warranty')}
+              </h3>
+              <p className="text-text-secondary font-light leading-relaxed">
+                {language === 'ar' ? 'نحن نضمن جودة منتجاتنا. ضمان شامل على جميع لوحات المفاتيح.' : 'Nous garantissons nos produits. Garantie complète sur tous les claviers mécaniques.'}
+              </p>
             </div>
           </div>
         </div>

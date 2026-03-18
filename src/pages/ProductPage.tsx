@@ -1,11 +1,15 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Star, ShoppingCart, Truck, ShieldCheck, ArrowLeft } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { turso, parseImageUrl } from '../lib/turso';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useConfig } from '../context/ConfigContext';
+import RelatedProductsSlider from '../components/RelatedProductsSlider';
+import { MessageSquare } from 'lucide-react';
 
 const getHighQualityUrl = (url: string | null | undefined) => {
   if (!url) return '';
@@ -26,7 +30,23 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { addToast } = useToast();
+  const { language, t, isRTL } = useLanguage();
+  const { config } = useConfig();
   const navigate = useNavigate();
+
+  const nextImage = useCallback(() => {
+    if (product?.images?.length > 1) {
+      setActiveImageIndex((prev) => (prev + 1) % product.images.length);
+      setCurrentDisplayImage(null);
+    }
+  }, [product?.images?.length]);
+
+  useEffect(() => {
+    if (product?.images?.length > 1) {
+      const interval = setInterval(nextImage, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [nextImage, product?.images?.length]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -36,7 +56,7 @@ export default function ProductPage() {
           sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                        p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
                        p.description_en, p.description_ar,
-                       c.name_en AS category_name, p.images
+                       c.name_en AS category_name, p.images, c.name_ar AS category_name_ar
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
                 WHERE p.id = ?`,
@@ -83,8 +103,10 @@ export default function ProductPage() {
           reviews: row[10],
           description_en: row[11],
           description_ar: row[12],
-          category: row[13] || 'Other',
-          name: row[1],
+          category_id: row[11],
+          category_en: row[13] || 'Other',
+          category_ar: row[15] || 'أخرى',
+          name: language === 'ar' ? row[2] : row[1],
           image: allImages[0],
           images: allImages,
           isNew: row[6],
@@ -100,7 +122,7 @@ export default function ProductPage() {
     };
 
     if (id) fetchProduct();
-  }, [id]);
+  }, [id, language]);
 
   if (loading) {
     return <div className="pt-32 pb-20"><LoadingSpinner /></div>;
@@ -109,9 +131,9 @@ export default function ProductPage() {
   if (!product) {
     return (
       <div className="pt-32 pb-20 text-center">
-        <h2 className="text-2xl font-bold text-gray-900">Product not found</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('common.error')}</h2>
         <Link to="/products" className="text-neon-blue hover:underline mt-4 inline-block">
-          Back to Products
+          {t('product.back')}
         </Link>
       </div>
     );
@@ -122,25 +144,27 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     if (product.variants && product.variants.length > 0 && !selectedVariant) {
-      addToast('Please select an option first', 'error');
+      addToast(t('product.select_option'), 'error');
       return false;
     }
     const productToCart = { ...product, selectedVariant };
     for (let i = 0; i < quantity; i++) {
       addToCart(productToCart);
     }
-    const variantSuffix = selectedVariant ? ` - ${selectedVariant.name_en}` : '';
-    addToast(`Added ${quantity} ${product.name}${variantSuffix} to cart`, 'success');
+    const variantName = selectedVariant ? (language === 'ar' ? selectedVariant.name_ar : selectedVariant.name_en) : '';
+    const variantSuffix = variantName ? ` - ${variantName}` : '';
+    addToast(language === 'ar' ? `تم إضافة ${quantity} ${product.name}${variantSuffix} إلى السلة` : `Ajouté ${quantity} ${product.name}${variantSuffix} au panier`, 'success');
     return true;
   };
 
   return (
-    <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300">
+    <div className={`pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'font-arabic' : ''}`}>
       <Link to="/products" className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary mb-8 transition-colors font-mono uppercase text-sm tracking-wider">
-        <ArrowLeft size={16} /> Back to Products
+        <ArrowLeft size={16} className={isRTL ? 'rotate-180' : ''} /> {t('product.back')}
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Product Images Section */}
         <div className="space-y-4">
           <div className="bg-bg-secondary border border-border-color overflow-hidden aspect-square relative group">
             <AnimatePresence mode="wait">
@@ -148,27 +172,44 @@ export default function ProductPage() {
                 key={currentDisplayImage || activeImageIndex}
                 src={getHighQualityUrl(currentDisplayImage || product.images[activeImageIndex])}
                 alt={product.name}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.4 }}
                 className={`w-full h-full object-cover ${isOutOfStock ? 'grayscale opacity-50' : ''}`}
               />
             </AnimatePresence>
+            
+            {/* Dots for mobile */}
+            {product.images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 sm:hidden">
+                {product.images.map((_: any, idx: number) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      activeImageIndex === idx ? 'bg-neon-blue w-4' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
             {product.isSale && (
-              <span className="absolute top-6 left-6 px-3 py-1 bg-neon-purple text-white font-bold uppercase tracking-wider text-sm">
-                Sale
+              <span className={`absolute top-6 ${isRTL ? 'right-6' : 'left-6'} px-3 py-1 bg-neon-purple text-white font-bold uppercase tracking-wider text-sm`}>
+                {t('product.sale')}
               </span>
             )}
             {isOutOfStock && (
-              <span className="absolute top-6 right-6 px-3 py-1 bg-gray-800 text-white font-bold uppercase tracking-wider text-sm">
-                Out of Stock
+              <span className={`absolute top-6 ${isRTL ? 'left-6' : 'right-6'} px-3 py-1 bg-gray-800 text-white font-bold uppercase tracking-wider text-sm`}>
+                {t('product.out_of_stock')}
               </span>
             )}
           </div>
 
+          {/* Thumbnails for desktop */}
           {product.images.length > 1 && (
-            <div className="grid grid-cols-4 sm:grid-cols-6 gap-3">
+            <div className="hidden sm:grid grid-cols-4 sm:grid-cols-6 gap-3">
               {product.images.map((img: string, index: number) => (
                 <button
                   key={index}
@@ -184,11 +225,14 @@ export default function ProductPage() {
           )}
         </div>
 
+        {/* Product Details Section */}
         <div>
           <span className="text-neon-blue font-bold tracking-widest uppercase text-sm mb-2 block font-mono">
-            {product.category}
+            {language === 'ar' ? product.category_ar : product.category_en}
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6 font-display uppercase tracking-tighter leading-none">{product.name}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-6 font-display uppercase tracking-tighter leading-none">
+            {product.name}
+          </h1>
 
           <div className="flex items-center gap-4 mb-8 border-b border-border-color pb-6">
             <div className="flex items-center text-neon-blue gap-1">
@@ -196,32 +240,20 @@ export default function ProductPage() {
               <span className="font-bold text-text-primary ml-2 font-mono">{product.rating}</span>
             </div>
             <span className="text-text-secondary">|</span>
-            <span className="text-text-secondary font-mono text-sm">{product.reviews} REVIEWS</span>
+            <span className="text-text-secondary font-mono text-sm uppercase">{product.reviews} {t('product.reviews')}</span>
           </div>
 
           <div className="flex items-end gap-4 mb-8">
-            <span className="text-4xl font-bold text-text-primary font-mono">{Math.round(product.price * 200)} DA</span>
+            <span className="text-4xl font-bold text-text-primary font-mono">{Math.round(product.price * 200)} {t('product.currency')}</span>
             {product.originalPrice && (
-              <span className="text-xl text-text-secondary line-through mb-1 font-mono">{Math.round(product.originalPrice * 200)} DA</span>
+              <span className="text-xl text-text-secondary line-through mb-1 font-mono">{Math.round(product.originalPrice * 200)} {t('product.currency')}</span>
             )}
           </div>
-
-          {product.stock > 0 && (
-            <div className={`flex items-center gap-2 font-bold mb-8 p-4 border ${isLowStock ? 'text-neon-purple bg-neon-purple/10 border-neon-purple/30' : 'text-neon-blue bg-neon-blue/10 border-neon-blue/30'}`}>
-              <span className="uppercase tracking-wider text-sm">
-                {isLowStock ? 'Limited Quantity Available' : 'Product is currently in stock'}
-              </span>
-            </div>
-          )}
-
-          <p className="text-text-secondary mb-8 leading-relaxed text-lg font-light border-l-2 border-border-color pl-6">
-            {product.description_ar || product.description_en || `Experience gaming like never before with the ${product.name}.`}
-          </p>
 
           {product.variants && product.variants.length > 0 && (
             <div className="mb-8 border-t border-border-color pt-6">
               <h3 className="text-text-primary font-bold uppercase tracking-wider mb-4 font-mono text-sm">
-                Select Option: <span className="text-neon-blue">{selectedVariant?.name_en}</span>
+                {t('product.select_option')}: <span className="text-neon-blue">{selectedVariant ? (language === 'ar' ? selectedVariant.name_ar : selectedVariant.name_en) : ''}</span>
               </h3>
               <div className="flex flex-wrap gap-3">
                 {product.variants.map((variant: any) => (
@@ -237,7 +269,7 @@ export default function ProductPage() {
                         : 'border-border-color hover:border-text-secondary text-text-secondary hover:text-text-primary bg-bg-secondary'
                     }`}
                   >
-                    {variant.name_en}
+                    {language === 'ar' ? variant.name_ar : variant.name_en}
                   </button>
                 ))}
               </div>
@@ -247,43 +279,66 @@ export default function ProductPage() {
           <div className="mb-10">
             {isOutOfStock ? (
               <div className="bg-bg-secondary border border-border-color text-text-secondary p-4 text-center font-bold uppercase tracking-wider">
-                This item is currently out of stock.
+                {t('product.out_of_stock')}
               </div>
             ) : (
-              <div className="flex flex-col sm:flex-row items-stretch gap-6">
-                <div className="flex items-center border border-border-color">
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row items-stretch gap-6">
+                  <div className="flex items-center border border-border-color">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-4 py-3 text-text-primary hover:bg-text-primary/10 transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 py-3 font-bold text-text-primary w-12 text-center font-mono">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-4 py-3 text-text-primary hover:bg-text-primary/10 transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
                   <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-4 py-3 text-text-primary hover:bg-text-primary/10 transition-colors"
+                    onClick={handleAddToCart}
+                    className="w-full sm:w-auto flex-1 bg-bg-secondary border border-border-color text-text-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-text-primary/10 transition-all flex items-center justify-center gap-3 group"
                   >
-                    -
+                    <ShoppingCart size={20} className="group-hover:scale-110 transition-transform" /> {t('product.add_to_cart')}
                   </button>
-                  <span className="px-4 py-3 font-bold text-text-primary w-12 text-center font-mono">{quantity}</span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="px-4 py-3 text-text-primary hover:bg-text-primary/10 transition-colors"
+                    onClick={() => {
+                      if (handleAddToCart()) {
+                        navigate('/checkout');
+                      }
+                    }}
+                    className="w-full sm:w-auto flex-1 bg-text-primary text-bg-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all flex items-center justify-center gap-3 group"
                   >
-                    +
+                    {t('product.buy_now')}
                   </button>
                 </div>
-                <button
-                  onClick={handleAddToCart}
-                  className="w-full sm:w-auto flex-1 bg-bg-secondary border border-border-color text-text-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-text-primary/10 transition-all flex items-center justify-center gap-3 group"
-                >
-                  <ShoppingCart size={20} className="group-hover:scale-110 transition-transform" /> Add to Cart
-                </button>
-                <button
-                  onClick={() => {
-                    if (handleAddToCart()) {
-                      navigate('/checkout');
-                    }
-                  }}
-                  className="w-full sm:w-auto flex-1 bg-text-primary text-bg-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all flex items-center justify-center gap-3 group"
-                >
-                  Buy Now
-                </button>
+                {config?.whatsapp_number && (
+                  <a
+                    href={`https://wa.me/${config.whatsapp_number}?text=${encodeURIComponent(
+                      language === 'ar' 
+                        ? `مرحباً، أود طلب: ${product.name_ar}${selectedVariant ? ` (${selectedVariant.name_ar})` : ''}`
+                        : `Bonjour, je souhaite commander : ${product.name_en}${selectedVariant ? ` (${selectedVariant.name_en})` : ''}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-[#25D366] text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-[#128C7E] transition-all flex items-center justify-center gap-3 group"
+                  >
+                    <MessageSquare size={20} /> {t('product.order_whatsapp')}
+                  </a>
+                )}
               </div>
             )}
+          </div>
+
+          <div className="mb-8 border-t border-border-color pt-6">
+            <h3 className="text-text-primary font-bold uppercase tracking-wider mb-4 font-mono text-sm">{t('product.description')}</h3>
+            <p className="text-text-secondary leading-relaxed text-lg font-light border-l-2 border-border-color pl-6">
+              {language === 'ar' ? product.description_ar : (product.description_en || `Experience gaming like never before with the ${product.name}.`)}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-border-color pt-8">
@@ -292,8 +347,8 @@ export default function ProductPage() {
                 <Truck size={24} strokeWidth={1.5} />
               </div>
               <div>
-                <h4 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-1">Free Shipping</h4>
-                <p className="text-xs text-text-secondary font-mono">On orders over 20,000 DA</p>
+                <h4 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-1">{t('product.free_shipping')}</h4>
+                <p className="text-xs text-text-secondary font-mono">{t('product.free_shipping_desc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -301,13 +356,15 @@ export default function ProductPage() {
                 <ShieldCheck size={24} strokeWidth={1.5} />
               </div>
               <div>
-                <h4 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-1">2-Year Warranty</h4>
-                <p className="text-xs text-text-secondary font-mono">Full coverage protection</p>
+                <h4 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-1">{t('product.warranty')}</h4>
+                <p className="text-xs text-text-secondary font-mono">{t('product.warranty_desc')}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <RelatedProductsSlider currentProductId={product.id} categoryId={product.category_id} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import { turso } from '../lib/turso';
 
 const styleMapping: any = {
@@ -11,6 +12,7 @@ const styleMapping: any = {
 
 export default function CategoryShowcase() {
   const [dbCategories, setDbCategories] = useState<any[]>([]);
+  const { language, t, isRTL } = useLanguage();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -53,25 +55,27 @@ export default function CategoryShowcase() {
                 <div className="absolute inset-0 z-10 w-full h-full rounded-[20px] overflow-hidden transition-all duration-300 ease-out group-hover:opacity-0 group-hover:invisible group-hover:-translate-y-3 group-hover:-translate-x-3">
                   <img
                     src={category.image_url}
-                    alt={category.name_en}
+                    alt={language === 'ar' ? category.name_ar : category.name_en}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/30" />
                   <div className="absolute bottom-10 left-10">
-                    <h3 className="text-4xl font-display font-bold text-white uppercase tracking-tighter">{category.name_ar || category.name_en}</h3>
+                    <h3 className="text-4xl font-display font-bold text-white uppercase tracking-tighter">
+                      {language === 'ar' ? category.name_ar : category.name_en}
+                    </h3>
                   </div>
                 </div>
 
                 <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-8 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:-translate-y-3 group-hover:-translate-x-3 ${styles.bg} border-2 ${styles.accent}`}>
                   <h3 className={`text-5xl md:text-6xl font-display font-black uppercase tracking-tighter mb-6 ${styles.text} leading-[0.9]`}>
-                    {category.name_ar || category.name_en}
+                    {language === 'ar' ? category.name_ar : category.name_en}
                   </h3>
                   <div className="absolute bottom-10 left-0 right-0 flex justify-center">
                     <Link
                       to={`/products?category=${encodeURIComponent(category.name_en)}`}
                       className={`inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold uppercase tracking-wider transition-transform hover:scale-105 ${styles.buttonBg} ${styles.buttonText}`}
                     >
-                      View Products <ArrowRight size={20} />
+                      {language === 'ar' ? 'عرض المنتجات' : 'Voir les produits'} <ArrowRight size={20} className={isRTL ? 'rotate-180' : ''} />
                     </Link>
                   </div>
                 </div>

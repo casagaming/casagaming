@@ -1,6 +1,8 @@
 import { motion } from 'motion/react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LoadingSpinner() {
+  const { t } = useLanguage();
   return (
     <div className="fixed inset-0 bg-bg-primary z-[60] flex items-center justify-center transition-colors duration-300">
       <div className="relative flex flex-col items-center gap-4">
@@ -14,7 +16,7 @@ export default function LoadingSpinner() {
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          Loading
+          {t('common.loading')}
         </motion.span>
       </div>
     </div>
