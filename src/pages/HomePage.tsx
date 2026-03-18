@@ -3,6 +3,7 @@ import Hero from '../components/Hero';
 import ProductGrid from '../components/ProductGrid';
 import Marquee from '../components/Marquee';
 import CategoryShowcase from '../components/CategoryShowcase';
+import CategoryGrid from '../components/CategoryGrid';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Truck, Zap } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -114,35 +115,6 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      
-      {/* Mobile Horizontal Category Bar */}
-      <div className="lg:hidden bg-bg-primary pt-6 pb-2 border-b border-border-color overflow-hidden">
-        <div className="px-4 mb-4 flex justify-between items-center">
-          <h2 className="text-lg font-bold text-text-primary tracking-tight">{t('nav.categories')}</h2>
-          <Link to="/categories" className="text-xs text-neon-blue font-mono font-bold uppercase">{language === 'ar' ? 'عرض الكل' : 'VOIR TOUT'}</Link>
-        </div>
-        <div className="flex overflow-x-auto gap-4 px-4 pb-4 scrollbar-hide snap-x">
-          {categories.map((cat) => (
-            <Link 
-              key={cat.id} 
-              to={`/products?category=${encodeURIComponent(cat.name_en)}`}
-              className="flex-shrink-0 flex flex-col items-center gap-2 snap-start"
-            >
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-border-color hover:border-neon-blue transition-colors bg-bg-secondary p-1">
-                <img 
-                  src={cat.image_url || 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=200&auto=format&fit=crop'} 
-                  alt={language === 'ar' ? cat.name_ar : cat.name_en}
-                  className="w-full h-full object-cover rounded-full"
-                />
-              </div>
-              <span className="text-[10px] font-bold text-text-primary uppercase tracking-tighter whitespace-nowrap">
-                {language === 'ar' ? cat.name_ar : cat.name_en}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </div>
-
       <Marquee />
 
       <ProductGrid
@@ -156,6 +128,8 @@ export default function HomePage() {
         products={popularProducts}
         linkHref="/products"
       />
+
+      <CategoryGrid />
 
       <CategoryShowcase />
 

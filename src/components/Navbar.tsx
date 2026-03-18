@@ -103,7 +103,7 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center space-x-6">
-              <div className="relative flex items-center">
+              <div className="hidden lg:flex relative items-center">
                 <AnimatePresence>
                   {isSearchOpen && (
                     <motion.form
@@ -147,7 +147,7 @@ export default function Navbar() {
                 {language === 'fr' ? 'AR' : 'FR'}
               </button>
 
-              <Link to="/cart" className="relative text-text-secondary hover:text-text-primary transition-colors group flex items-center gap-2">
+              <Link to="/cart" className="hidden lg:flex relative text-text-secondary hover:text-text-primary transition-colors group items-center gap-2">
                 <ShoppingCart size={20} />
                 <span className="font-mono text-xs font-bold">[{cartCount}]</span>
               </Link>
@@ -181,7 +181,7 @@ export default function Navbar() {
                   </button>
                 </div>
                 <div className="flex flex-col space-y-8 flex-1">
-                  {navLinks.slice(0, 3).map((link) => (
+                  {navLinks.map((link) => (
                     <Link
                       key={link.name}
                       to={link.href}

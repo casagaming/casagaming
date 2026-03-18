@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { turso } from '../lib/turso';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function CategoryGrid() {
+  const { language } = useLanguage();
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,9 +46,11 @@ export default function CategoryGrid() {
     <section className="py-16 bg-bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-end mb-8">
-          <h2 className="text-3xl font-bold text-text-primary">Shop by Category</h2>
-          <Link to="/products" className="text-neon-blue hover:text-neon-purple transition-colors font-medium hidden sm:block">
-            View All Categories →
+          <h2 className="text-3xl font-bold text-text-primary">
+            {language === 'ar' ? 'تسوق حسب الفئة' : 'Acheter par catégorie'}
+          </h2>
+          <Link to="/categories" className="text-neon-blue hover:text-neon-purple transition-colors font-medium hidden sm:block">
+            {language === 'ar' ? 'عرض كل الفئات ←' : 'Voir toutes les catégories ←'}
           </Link>
         </div>
 
