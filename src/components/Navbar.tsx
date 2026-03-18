@@ -181,7 +181,7 @@ export default function Navbar() {
                   </button>
                 </div>
                 <div className="flex flex-col space-y-8 flex-1">
-                  {navLinks.map((link) => (
+                  {navLinks.slice(0, 3).map((link) => (
                     <Link
                       key={link.name}
                       to={link.href}

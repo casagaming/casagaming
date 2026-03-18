@@ -105,6 +105,23 @@ export default function CheckoutPage() {
       }
 
       clearCart();
+      
+      // Trigger Pusher notification for the Admin Control Panel
+      try {
+        await fetch('https://casagaming-control.onrender.com/api/orders', { // Note: Replace with actual control panel URL if different
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: orderId,
+            customer_name: `${firstName} ${lastName}`,
+            phone,
+            total_price: (cartTotal * 200) + shippingCost
+          })
+        });
+      } catch (err) {
+        console.error('Notification trigger failed:', err);
+      }
+
       navigate(`/order-received?order_id=${orderId}`);
     } catch (error: any) {
       console.error('Error submitting order:', error);

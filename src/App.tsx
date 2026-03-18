@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import MobileBottomNav from './components/MobileBottomNav';
 import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ScrollToTop from './components/ScrollToTop';
@@ -46,6 +47,7 @@ export default function App() {
                 </main>
 
                 <Footer />
+                <MobileBottomNav />
               </div>
             </Router>
           </CartProvider>

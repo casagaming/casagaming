@@ -1,5 +1,5 @@
 const TURSO_DIRECT_URL = 'https://casagaming1-casagaming.aws-eu-west-1.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzM4MTE5MzUsImlkIjoiMDE5Y2ZmNjQtODQwMS03OTE4LTkwYWMtYzg0NDVjMmU5YTJhIiwicmlkIjoiNmY0ZmRlMDYtMmYwYy00YzcyLTkxY2EtOGVmNDFjMGIxMDllIn0.6mFCZ0ai9OM7Sl51Yqmk0mELbWz0p0yK7D1if7uwaTlwclYmLTCMroYhVQ-Mf7bepUMBpTJecKrnpeUsaNa-DA';
+const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzM4MTY2MzUsImlkIjoiMDE5Y2ZmNjQtODQwMS03OTE4LTkwYWMtYzg0NDVjMmU5YTJhIiwicmlkIjoiNmY0ZmRlMDYtMmYwYy00YzcyLTkxY2EtOGVmNDFjMGIxMDllIn0.uI1magG-U9X1NVygJU0-jRincNwJhsvcvl5gBJZj3FsKARpFLFH0ORe4Vcbmz7Udhn1nmh9ePxFBT1QAHm3mDg';
 
 const isDev = import.meta.env.DEV;
 const API_BASE = isDev ? '/api/turso' : TURSO_DIRECT_URL;

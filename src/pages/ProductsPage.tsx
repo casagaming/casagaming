@@ -152,7 +152,7 @@ export default function ProductsPage() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
           </div>
 
-          <div className="relative group w-full sm:w-auto">
+          <div className="hidden sm:block relative group w-full sm:w-auto">
             <button className="flex items-center justify-between w-full sm:w-auto gap-4 px-6 py-3 border border-border-color bg-bg-secondary text-text-primary hover:border-neon-blue transition-colors font-mono text-sm uppercase tracking-wider">
               <div className="flex items-center gap-2">
                 <Filter size={16} />
@@ -173,6 +173,22 @@ export default function ProductsPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile-only horizontal category filter */}
+      <div className="sm:hidden mb-10 -mx-4 px-4 overflow-x-auto scrollbar-hide flex gap-2 snap-x">
+        {dbCategories.map(cat => (
+          <button
+            key={cat.name_en}
+            onClick={() => handleCategoryChange(cat.name_en)}
+            className={`flex-shrink-0 px-6 py-2 rounded-full border text-xs font-bold font-mono uppercase transition-all snap-start
+              ${selectedCategory === cat.name_en 
+                ? 'bg-neon-blue border-neon-blue text-black shadow-[0_0_15px_rgba(0,243,255,0.3)]' 
+                : 'bg-bg-secondary border-border-color text-text-secondary hover:border-neon-blue'}`}
+          >
+            {language === 'ar' ? cat.name_ar : cat.name_en}
+          </button>
+        ))}
       </div>
 
       {loading ? (
