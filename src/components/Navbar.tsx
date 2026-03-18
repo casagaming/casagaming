@@ -78,7 +78,7 @@ export default function Navbar() {
 
             <Link to="/" className="flex-shrink-0 flex items-center gap-2 group">
               {config?.logo_url ? (
-                <img src={config.logo_url} alt={config.store_name} className="h-10 w-auto object-contain" />
+                <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-10 w-auto object-contain" />
               ) : (
                 <div className="flex flex-col">
                   <span className="font-display font-bold text-2xl tracking-tighter leading-none text-text-primary group-hover:text-neon-blue transition-colors duration-300">

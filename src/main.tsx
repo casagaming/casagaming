@@ -8,9 +8,7 @@ import { ConfigProvider } from './context/ConfigContext';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <ConfigProvider>
-        <App />
-      </ConfigProvider>
+      <App />
     </ThemeProvider>
   </StrictMode>,
 );
