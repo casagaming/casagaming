@@ -27,6 +27,10 @@ export default function HomePage() {
            FROM products p
            LEFT JOIN categories c ON p.category_id = c.id
            WHERE p.is_new = 1
+             AND p.name_en NOT LIKE '%tast%'
+             AND p.name_ar NOT LIKE '%tast%'
+             AND p.name_en NOT LIKE '%test%'
+             AND p.name_ar NOT LIKE '%test%'
            LIMIT 6`
         );
 
@@ -64,6 +68,10 @@ export default function HomePage() {
                   (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
            FROM products p
            LEFT JOIN categories c ON p.category_id = c.id
+           WHERE p.name_en NOT LIKE '%tast%'
+             AND p.name_ar NOT LIKE '%tast%'
+             AND p.name_en NOT LIKE '%test%'
+             AND p.name_ar NOT LIKE '%test%'
            ORDER BY p.reviews_count DESC
            LIMIT 12`
         );

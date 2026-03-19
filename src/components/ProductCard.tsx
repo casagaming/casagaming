@@ -23,10 +23,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const categoryName = language === 'ar' ? (product.category_ar || product.category) : (product.category_en || product.category);
 
   const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
     if (product.variants_count > 0) {
       return; // Link wrapper handles navigation
     }
+    e.preventDefault();
     if (!isOutOfStock) {
       addToCart(product);
       addToast(language === 'ar' ? `تم إضافة ${productName} إلى السلة` : `Ajouté ${productName} au panier`, 'success');
@@ -102,10 +102,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               )}
             </div>
             
-            <button 
+            <div 
               onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-mono flex items-center justify-center gap-2
+              className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-all duration-300 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} font-mono flex items-center justify-center gap-2
                 ${product.variants_count > 0 
                   ? 'bg-transparent border border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black' 
                   : 'bg-neon-blue text-black hover:bg-neon-blue/80 shadow-[0_0_10px_rgba(0,243,255,0.2)] hover:shadow-[0_0_20px_rgba(0,243,255,0.4)]'
@@ -114,7 +113,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               {isOutOfStock 
                 ? (language === 'ar' ? 'نفذ' : 'Sold Out') 
                 : (product.variants_count > 0 ? t('product.view_product') : t('product.add_to_cart'))}
-            </button>
+            </div>
           </div>
         </div>
       </Link>

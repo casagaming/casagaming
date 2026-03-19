@@ -55,7 +55,7 @@ export default function ProductPage() {
         const productResult = await turso.execute({
           sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                        p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
-                       p.description_en, p.description_ar,
+                       p.description_en, p.description_ar, p.category_id,
                        c.name_en AS category_name, p.images, c.name_ar AS category_name_ar
                 FROM products p
                 LEFT JOIN categories c ON p.category_id = c.id
@@ -70,7 +70,7 @@ export default function ProductPage() {
 
         const row = productResult.rows[0] as any[];
         const primaryImage = row[5] ? [row[5]] : [];
-        const extraImages = parseImageUrl(row[14]);
+        const extraImages = parseImageUrl(row[15]);
         const rawImages = Array.from(new Set([...primaryImage, ...extraImages])).filter(Boolean);
 
         const variantsResult = await turso.execute({
@@ -103,9 +103,9 @@ export default function ProductPage() {
           reviews: row[10],
           description_en: row[11],
           description_ar: row[12],
-          category_id: row[11],
-          category_en: row[13] || 'Other',
-          category_ar: row[15] || 'أخرى',
+          category_id: row[13],
+          category_en: row[14] || 'Other',
+          category_ar: row[16] || 'أخرى',
           name: language === 'ar' ? row[2] : row[1],
           image: allImages[0],
           images: allImages,

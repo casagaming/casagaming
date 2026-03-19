@@ -62,7 +62,11 @@ export default function ProductsPage() {
                   c.name_en AS category_name, c.name_ar AS category_name_ar,
                   (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
            FROM products p
-           LEFT JOIN categories c ON p.category_id = c.id`
+           LEFT JOIN categories c ON p.category_id = c.id
+           WHERE p.name_en NOT LIKE '%tast%' 
+             AND p.name_ar NOT LIKE '%tast%'
+             AND p.name_en NOT LIKE '%test%'
+             AND p.name_ar NOT LIKE '%test%'`
         );
 
         const formatted = result.rows.map((row: any) => {
