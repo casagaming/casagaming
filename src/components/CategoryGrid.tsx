@@ -73,10 +73,10 @@ export default function CategoryGrid() {
                     className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-90 group-hover:opacity-60 transition-opacity" />
                 <div className="absolute bottom-0 left-0 p-4 w-full flex flex-col gap-2">
                   <h3 className="text-white font-bold text-lg group-hover:text-neon-blue transition-colors">{category.name_ar || category.name_en}</h3>
-                  <div className="sm:hidden mt-1 px-3 py-1.5 bg-neon-blue text-black text-[10px] font-bold uppercase tracking-tighter w-fit rounded-sm shadow-[0_0_10px_rgba(0,243,255,0.3)]">
+                  <div className="sm:hidden mt-1 px-4 py-2 bg-neon-blue text-black text-[11px] font-bold uppercase tracking-widest w-fit rounded-sm shadow-[0_0_15px_rgba(0,243,255,0.4)] transition-transform active:scale-95">
                     {language === 'ar' ? 'دخول' : 'ENTRER'}
                   </div>
                 </div>

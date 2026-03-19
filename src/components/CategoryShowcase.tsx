@@ -64,8 +64,8 @@ export default function CategoryShowcase() {
                   </div>
                 </div>
 
-                <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-8 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible md:group-hover:-translate-y-3 md:group-hover:-translate-x-3 max-md:opacity-100 max-md:visible ${styles.bg} border-2 ${styles.accent}`}>
-                  <h3 className={`text-4xl md:text-6xl font-display font-black uppercase tracking-tighter mb-6 ${styles.text} leading-[0.9]`}>
+                <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-8 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible md:group-hover:-translate-y-3 md:group-hover:-translate-x-3 max-md:opacity-100 max-md:visible max-md:bg-gradient-to-t max-md:from-black/90 max-md:to-transparent md:${styles.bg} border-2 ${styles.accent}`}>
+                  <h3 className={`text-4xl md:text-6xl font-display font-black uppercase tracking-tighter mb-6 ${styles.text} max-md:text-white leading-[0.9]`}>
                     {language === 'ar' ? category.name_ar : category.name_en}
                   </h3>
                   <div className="absolute bottom-10 left-0 right-0 flex justify-center">
@@ -73,7 +73,9 @@ export default function CategoryShowcase() {
                       to={`/products?category=${encodeURIComponent(category.name_en)}`}
                       className={`inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold uppercase tracking-wider transition-transform hover:scale-105 ${styles.buttonBg} ${styles.buttonText}`}
                     >
-                      {language === 'ar' ? 'عرض المنتجات' : 'Voir les produits'} <ArrowRight size={20} className={isRTL ? 'rotate-180' : ''} />
+                      <span className="hidden md:inline">{language === 'ar' ? 'عرض المنتجات' : 'Voir les produits'}</span>
+                      <span className="md:hidden">{language === 'ar' ? 'دخول' : 'ENTRER'}</span>
+                      <ArrowRight size={20} className={isRTL ? 'rotate-180' : ''} />
                     </Link>
                   </div>
                 </div>

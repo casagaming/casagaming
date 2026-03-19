@@ -103,7 +103,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
             
             <div 
-              onClick={handleAddToCart}
+              onClick={product.variants_count > 0 ? undefined : handleAddToCart}
               className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-all duration-300 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} font-mono flex items-center justify-center gap-2
                 ${product.variants_count > 0 
                   ? 'bg-transparent border border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black' 

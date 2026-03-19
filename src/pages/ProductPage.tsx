@@ -74,7 +74,11 @@ export default function ProductPage() {
         const rawImages = Array.from(new Set([...primaryImage, ...extraImages])).filter(Boolean);
 
         const variantsResult = await turso.execute({
-          sql: 'SELECT id, name_en, name_ar, image_url, stock FROM product_variants WHERE product_id = ?',
+          sql: `SELECT id, name_en, name_ar, image_url, stock 
+                FROM product_variants 
+                WHERE product_id = ? 
+                  AND name_en NOT LIKE '%test%' AND name_en NOT LIKE '%tast%'
+                  AND name_ar NOT LIKE '%تجربة%' AND name_ar NOT LIKE '%تست%'`,
           args: [id!],
         });
 

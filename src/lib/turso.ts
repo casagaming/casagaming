@@ -72,14 +72,16 @@ export async function execute(
 export const turso = { execute };
 
 export function parseImageUrl(value: any): string[] {
-  if (Array.isArray(value)) return value.filter(Boolean);
+  const isUrl = (url: any) => typeof url === 'string' && (url.startsWith('http') || url.startsWith('/'));
+  
+  if (Array.isArray(value)) return value.filter(isUrl);
   if (typeof value === 'string' && value) {
     try {
       const parsed = JSON.parse(value);
-      if (Array.isArray(parsed)) return parsed.filter(Boolean);
-      return [parsed];
+      if (Array.isArray(parsed)) return parsed.filter(isUrl);
+      return isUrl(parsed) ? [parsed] : [];
     } catch {
-      return [value];
+      return isUrl(value) ? [value] : [];
     }
   }
   return [];
