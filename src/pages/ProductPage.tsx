@@ -210,7 +210,7 @@ export default function ProductPage() {
               ))}
             </div>
           )}
-          </div>
+
 
           {/* Thumbnails for desktop */}
           {product.images.length > 1 && (
