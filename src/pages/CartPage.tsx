@@ -61,7 +61,7 @@ export default function CartPage() {
                   </div>
                   
                   <div className="sm:col-span-2 text-center font-bold text-text-primary font-mono text-lg">
-                    {item.price * 200} {t('product.currency')}
+                    {Math.round(item.price)} {t('product.currency')}
                   </div>
                   
                   <div className="sm:col-span-2 flex justify-center">
@@ -83,7 +83,7 @@ export default function CartPage() {
                   </div>
                   
                   <div className="sm:col-span-2 text-right font-bold text-neon-blue font-mono text-lg">
-                    {item.price * item.quantity * 200} {t('product.currency')}
+                    {Math.round(item.price * item.quantity)} {t('product.currency')}
                   </div>
                 </div>
               ))}
@@ -105,7 +105,7 @@ export default function CartPage() {
             <div className="space-y-4 mb-8 border-b border-border-color pb-8">
               <div className="flex justify-between text-text-secondary font-mono text-sm">
                 <span>{t('cart.subtotal')}</span>
-                <span className="font-bold text-text-primary">{cartTotal * 200} {t('product.currency')}</span>
+                <span className="font-bold text-text-primary">{Math.round(cartTotal)} {t('product.currency')}</span>
               </div>
               <div className="flex justify-between text-text-secondary font-mono text-sm">
                 <span>{language === 'ar' ? 'الشحن' : 'Expédition'}</span>
@@ -117,7 +117,7 @@ export default function CartPage() {
             
             <div className="flex justify-between text-xl font-bold text-text-primary mb-8 font-display uppercase tracking-wider">
               <span>{t('cart.total')}</span>
-              <span>{cartTotal * 200} {t('product.currency')}</span>
+              <span>{Math.round(cartTotal)} {t('product.currency')}</span>
             </div>
             
             <Link to="/checkout" className="block w-full bg-neon-purple text-white text-center py-4 font-bold uppercase tracking-widest hover:bg-text-primary hover:text-bg-primary transition-all flex items-center justify-center gap-2 group">

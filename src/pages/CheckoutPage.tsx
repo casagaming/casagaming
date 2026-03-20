@@ -89,7 +89,7 @@ export default function CheckoutPage() {
           municipality,
           shippingMethod === 'home' ? address : 'STOP DESK',
           shippingCost,
-          (cartTotal * 200) + shippingCost,
+          cartTotal + shippingCost,
           'pending',
         ],
       });
@@ -115,7 +115,7 @@ export default function CheckoutPage() {
             id: orderId,
             customer_name: `${firstName} ${lastName}`,
             phone,
-            total_price: (cartTotal * 200) + shippingCost
+            total_price: cartTotal + shippingCost
           })
         });
       } catch (err) {
@@ -330,7 +330,7 @@ export default function CheckoutPage() {
                       {language === 'ar' ? ((item as any).category_ar || (item as any).category) : ((item as any).category_en || (item as any).category)}
                     </p>
                   </div>
-                  <span className="font-bold text-text-primary whitespace-nowrap font-mono">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-bold text-text-primary whitespace-nowrap font-mono">{Math.round(item.price * item.quantity)} {t('product.currency')}</span>
                 </div>
               ))}
             </div>
@@ -338,7 +338,7 @@ export default function CheckoutPage() {
             <div className="border-t border-border-color pt-6 space-y-4">
               <div className="flex justify-between text-text-secondary font-mono text-sm">
                 <span>{t('cart.subtotal')}</span>
-                <span className="font-bold text-text-primary">{cartTotal * 200} {t('product.currency')}</span>
+                <span className="font-bold text-text-primary">{Math.round(cartTotal)} {t('product.currency')}</span>
               </div>
               <div className="flex justify-between text-text-secondary font-mono text-sm">
                 <span>{t('checkout.shipping_cost')} ({shippingMethod === 'home' ? t('checkout.home_delivery') : t('checkout.stop_desk')})</span>
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
                 <span>{t('checkout.total')}</span>
                 <div className="text-right">
                   <span className="block text-xs text-text-secondary font-normal font-mono mb-1">{language === 'ar' ? 'تقريباً' : 'APPROX.'}</span>
-                  <span>{(cartTotal * 200) + shippingCost} {t('product.currency')}</span>
+                  <span>{Math.round(cartTotal + shippingCost)} {t('product.currency')}</span>
                 </div>
               </div>
             </div>
