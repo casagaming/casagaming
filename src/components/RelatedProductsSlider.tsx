@@ -15,8 +15,11 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
   const { language, t, isRTL } = useLanguage();
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
         // Fetch all products except the current one
-        result = await turso.execute({
+        const result = await turso.execute({
           sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                       p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
                       c.name_en AS category_name_en, c.name_ar AS category_name_ar,
@@ -59,32 +62,32 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
     };
 
     fetchProducts();
-  }, [categoryId, currentProductId, language]);
+  }, [currentProductId, language]);
 
   if (loading || products.length === 0) return null;
 
-  // Repeat the list enough times to ensure it fills any screen and loops seamlessly
-  // We want at least 20 items total to be safe
-  const repeatCount = Math.max(3, Math.ceil(20 / products.length));
-  const displayProducts = Array(repeatCount).fill(products).flat();
+  // Only animate if there are enough products to overflow
+  // On desktop we show 4-5 products. So if <= 4, keep it static.
+  const shouldAnimate = products.length > 4;
 
-  // Animation moves by one full set of products
-  const movePercentage = -(100 / repeatCount);
+  const repeatCount = shouldAnimate ? Math.max(3, Math.ceil(20 / products.length)) : 1;
+  const displayProducts = shouldAnimate ? Array(repeatCount).fill(products).flat() : products;
+  const movePercentage = shouldAnimate ? -(100 / repeatCount) : 0;
 
   return (
     <div className="mt-20 overflow-hidden py-10 border-t border-border-color">
       <h2 className="text-2xl font-bold text-text-primary mb-10 font-display uppercase tracking-widest text-center px-4">
-        {language === 'ar' ? 'منتجات قد تعجبك' : 'Vous pourriez aussi aimer'}
+        {language === 'ar' ? 'جميع المنتجات' : 'Tous les produits'}
       </h2>
       
       <div className="relative">
         <motion.div 
-          className="flex gap-4 px-4 w-max"
-          animate={{
+          className={`flex gap-4 px-4 ${shouldAnimate ? 'w-max' : 'justify-center flex-wrap'}`}
+          animate={shouldAnimate ? {
             x: isRTL ? [`${movePercentage}%`, "0%"] : ["0%", `${movePercentage}%`],
-          }}
+          } : {}}
           transition={{
-            duration: products.length * 5, // Speed depends on number of items
+            duration: products.length * 5,
             repeat: Infinity,
             ease: "linear",
           }}
