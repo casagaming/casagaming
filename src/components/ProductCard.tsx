@@ -97,7 +97,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="mt-auto pt-3 border-t border-border-color/50 flex flex-col gap-3">
             <div className={`flex items-center gap-1.5 md:gap-2 font-mono ${isRTL ? 'flex-row-reverse' : ''}`}>
               <span className="text-base md:text-lg font-bold text-text-primary">{Math.round(product.price)} {t('product.currency')}</span>
-              {product.originalPrice && (
+              {product.originalPrice > 0 && (
                 <span className="text-xs md:text-sm text-text-secondary line-through">{Math.round(product.originalPrice)} {t('product.currency')}</span>
               )}
             </div>

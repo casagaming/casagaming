@@ -246,7 +246,7 @@ export default function ProductPage() {
 
           <div className="flex items-end gap-4 mb-8">
             <span className="text-4xl font-bold text-text-primary font-mono">{Math.round(product.price)} {t('product.currency')}</span>
-            {product.originalPrice && (
+            {product.originalPrice > 0 && (
               <span className="text-xl text-text-secondary line-through mb-1 font-mono">{Math.round(product.originalPrice)} {t('product.currency')}</span>
             )}
           </div>

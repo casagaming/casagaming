@@ -12,39 +12,21 @@ interface RelatedProductsSliderProps {
 const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentProductId, categoryId }) => {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { language, t } = useLanguage();
+  const { language, t, isRTL } = useLanguage();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        // Try same category first
-        let result = await turso.execute({
+        // Fetch all products except the current one
+        result = await turso.execute({
           sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                       p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
                       c.name_en AS category_name_en, c.name_ar AS category_name_ar,
                       (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
                FROM products p
                LEFT JOIN categories c ON p.category_id = c.id
-               WHERE p.category_id = ? AND p.id != ?
-               LIMIT 10`,
-          args: [categoryId, currentProductId]
+               WHERE p.id != ?
+               ORDER BY p.id DESC`,
+          args: [currentProductId]
         });
-
-        // Fallback to general popular products if empty or null category
-        if (result.rows.length === 0) {
-          result = await turso.execute({
-            sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
-                        p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
-                        c.name_en AS category_name_en, c.name_ar AS category_name_ar,
-                        (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
-                 FROM products p
-                 LEFT JOIN categories c ON p.category_id = c.id
-                 WHERE p.id != ?
-                 ORDER BY p.reviews_count DESC
-                 LIMIT 10`,
-            args: [currentProductId]
-          });
-        }
 
         const formatted = result.rows.map((row: any) => {
           const images = parseImageUrl(row[5]);
@@ -81,33 +63,34 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
 
   if (loading || products.length === 0) return null;
 
+  // Repeat the list enough times to ensure it fills any screen and loops seamlessly
+  // We want at least 20 items total to be safe
+  const repeatCount = Math.max(3, Math.ceil(20 / products.length));
+  const displayProducts = Array(repeatCount).fill(products).flat();
+
+  // Animation moves by one full set of products
+  const movePercentage = -(100 / repeatCount);
+
   return (
     <div className="mt-20 overflow-hidden py-10 border-t border-border-color">
-      <h2 className="text-2xl font-bold text-text-primary mb-10 font-display uppercase tracking-widest text-center">
+      <h2 className="text-2xl font-bold text-text-primary mb-10 font-display uppercase tracking-widest text-center px-4">
         {language === 'ar' ? 'منتجات قد تعجبك' : 'Vous pourriez aussi aimer'}
       </h2>
       
       <div className="relative">
         <motion.div 
-          className="flex gap-4 px-4"
+          className="flex gap-4 px-4 w-max"
           animate={{
-            x: [0, -256, -256, -512, -512, -768, -768, -1024, -1024, 0],
+            x: isRTL ? [`${movePercentage}%`, "0%"] : ["0%", `${movePercentage}%`],
           }}
           transition={{
-            duration: 30,
+            duration: products.length * 5, // Speed depends on number of items
             repeat: Infinity,
-            ease: "easeInOut",
-            times: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1],
+            ease: "linear",
           }}
         >
-          {products.map((product, index) => (
+          {displayProducts.map((product, index) => (
             <div key={`${product.id}-${index}`} className="w-[200px] md:w-[240px] flex-shrink-0">
-              <ProductCard product={product} />
-            </div>
-          ))}
-          {/* Looping clones */}
-          {products.slice(0, 5).map((product, index) => (
-            <div key={`clone-${product.id}-${index}`} className="w-[200px] md:w-[240px] flex-shrink-0">
               <ProductCard product={product} />
             </div>
           ))}
