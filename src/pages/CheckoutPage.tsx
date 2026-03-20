@@ -131,7 +131,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !isSubmitting) {
     return (
       <div className="pt-32 pb-20 text-center min-h-[60vh] flex flex-col justify-center items-center">
         <h2 className="text-4xl font-bold text-text-primary font-display uppercase tracking-tighter mb-6">{t('cart.empty')}</h2>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, Package, Truck, ArrowRight, ShoppingBag } from 'lucide-react';
-import { turso } from '../lib/turso';
+import { turso, parseImageUrl } from '../lib/turso';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -100,8 +100,9 @@ export default function OrderReceivedPage() {
 
         <div className="space-y-4 mb-8">
           {order.order_items?.map((item: any) => {
-            const images = Array.isArray(item.products?.image_url) ? item.products.image_url : [item.products?.image_url];
-            const displayImage = item.product_variants?.image_url || images[0];
+            const productImages = parseImageUrl(item.products?.image_url);
+            const variantImages = parseImageUrl(item.product_variants?.image_url);
+            const displayImage = variantImages[0] || productImages[0];
             return (
               <div key={item.id} className="flex items-center gap-4 text-sm font-mono uppercase pb-2 border-b border-border-color last:border-0">
                 {displayImage && (
