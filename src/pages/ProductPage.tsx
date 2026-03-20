@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { turso, parseImageUrl } from '../lib/turso';
+import { turso, parseImageUrl, isValidUrl } from '../lib/turso';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useConfig } from '../context/ConfigContext';
 import RelatedProductsSlider from '../components/RelatedProductsSlider';
@@ -69,7 +69,7 @@ export default function ProductPage() {
         }
 
         const row = productResult.rows[0] as any[];
-        const primaryImage = row[5] ? [row[5]] : [];
+        const primaryImage = isValidUrl(row[5]) ? [row[5]] : [];
         const extraImages = parseImageUrl(row[15]);
         const rawImages = Array.from(new Set([...primaryImage, ...extraImages])).filter(Boolean);
 
@@ -86,7 +86,7 @@ export default function ProductPage() {
           stock: vrow[4],
         }));
 
-        const variantImages = variants.map((v: any) => v.image_url).filter(Boolean);
+        const variantImages = variants.map((v: any) => v.image_url).filter(isValidUrl);
         const allImages = Array.from(new Set([...rawImages, ...variantImages]));
 
         setProduct({

@@ -74,14 +74,14 @@ export const turso = { execute };
 export const isValidUrl = (url: any) => typeof url === 'string' && (url.startsWith('http') || url.startsWith('/'));
 
 export function parseImageUrl(value: any): string[] {
-  if (Array.isArray(value)) return value.filter(Boolean);
+  if (Array.isArray(value)) return value.filter(isValidUrl);
   if (typeof value === 'string' && value) {
     try {
       const parsed = JSON.parse(value);
-      if (Array.isArray(parsed)) return parsed.filter(Boolean);
-      return parsed ? [parsed] : [];
+      if (Array.isArray(parsed)) return parsed.filter(isValidUrl);
+      return isValidUrl(parsed) ? [parsed] : [];
     } catch {
-      return [value];
+      return isValidUrl(value) ? [value] : [];
     }
   }
   return [];

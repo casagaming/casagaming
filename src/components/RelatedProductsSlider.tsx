@@ -89,25 +89,25 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
       
       <div className="relative">
         <motion.div 
-          className="flex gap-6 px-4"
+          className="flex gap-4 px-4"
           animate={{
-            x: [0, -344, -344, -688, -688, -1032, -1032, -1376, -1376, 0],
+            x: [0, -256, -256, -512, -512, -768, -768, -1024, -1024, 0],
           }}
           transition={{
-            duration: 25,
+            duration: 30,
             repeat: Infinity,
             ease: "easeInOut",
             times: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1],
           }}
         >
           {products.map((product, index) => (
-            <div key={`${product.id}-${index}`} className="min-w-[280px] md:min-w-[320px] flex-shrink-0">
+            <div key={`${product.id}-${index}`} className="w-[200px] md:w-[240px] flex-shrink-0">
               <ProductCard product={product} />
             </div>
           ))}
           {/* Looping clones */}
-          {products.slice(0, 4).map((product, index) => (
-            <div key={`clone-${product.id}-${index}`} className="min-w-[280px] md:min-w-[320px] flex-shrink-0">
+          {products.slice(0, 5).map((product, index) => (
+            <div key={`clone-${product.id}-${index}`} className="w-[200px] md:w-[240px] flex-shrink-0">
               <ProductCard product={product} />
             </div>
           ))}
