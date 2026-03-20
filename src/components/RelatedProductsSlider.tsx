@@ -15,9 +15,10 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
   const { language, t } = useLanguage();
 
   useEffect(() => {
-    const fetchRelatedProducts = async () => {
+    const fetchProducts = async () => {
       try {
-        const result = await turso.execute({
+        // Try same category first
+        let result = await turso.execute({
           sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                       p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
                       c.name_en AS category_name_en, c.name_ar AS category_name_ar,
@@ -28,6 +29,22 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
                LIMIT 10`,
           args: [categoryId, currentProductId]
         });
+
+        // Fallback to general popular products if empty or null category
+        if (result.rows.length === 0) {
+          result = await turso.execute({
+            sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
+                        p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
+                        c.name_en AS category_name_en, c.name_ar AS category_name_ar,
+                        (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
+                 FROM products p
+                 LEFT JOIN categories c ON p.category_id = c.id
+                 WHERE p.id != ?
+                 ORDER BY p.reviews_count DESC
+                 LIMIT 10`,
+            args: [currentProductId]
+          });
+        }
 
         const formatted = result.rows.map((row: any) => {
           const images = parseImageUrl(row[5]);
@@ -59,7 +76,7 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
       }
     };
 
-    fetchRelatedProducts();
+    fetchProducts();
   }, [categoryId, currentProductId, language]);
 
   if (loading || products.length === 0) return null;

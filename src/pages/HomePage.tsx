@@ -23,16 +23,10 @@ export default function HomePage() {
           `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                   p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
                   c.name_en AS category_name_en, c.name_ar AS category_name_ar,
-                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id 
-                   AND name_en NOT LIKE '%test%' AND name_en NOT LIKE '%tast%'
-                   AND name_ar NOT LIKE '%تجربة%' AND name_ar NOT LIKE '%تست%') as variants_count
+                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
            FROM products p
            LEFT JOIN categories c ON p.category_id = c.id
            WHERE p.is_new = 1
-             AND p.name_en NOT LIKE '%tast%'
-             AND p.name_ar NOT LIKE '%tast%'
-             AND p.name_en NOT LIKE '%test%'
-             AND p.name_ar NOT LIKE '%test%'
            LIMIT 6`
         );
 
@@ -67,15 +61,9 @@ export default function HomePage() {
           `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                   p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
                   c.name_en AS category_name_en, c.name_ar AS category_name_ar,
-                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id 
-                   AND name_en NOT LIKE '%test%' AND name_en NOT LIKE '%tast%'
-                   AND name_ar NOT LIKE '%تجربة%' AND name_ar NOT LIKE '%تست%') as variants_count
+                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
            FROM products p
            LEFT JOIN categories c ON p.category_id = c.id
-           WHERE p.name_en NOT LIKE '%tast%'
-             AND p.name_ar NOT LIKE '%tast%'
-             AND p.name_en NOT LIKE '%test%'
-             AND p.name_ar NOT LIKE '%test%'
            ORDER BY p.reviews_count DESC
            LIMIT 12`
         );
