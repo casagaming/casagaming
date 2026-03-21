@@ -5,7 +5,7 @@ import Marquee from '../components/Marquee';
 import CategoryShowcase from '../components/CategoryShowcase';
 import CategoryGrid from '../components/CategoryGrid';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Truck, Zap } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Truck } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { turso, parseImageUrl } from '../lib/turso';
 import { motion } from 'motion/react';
@@ -160,19 +160,7 @@ export default function HomePage() {
                 {t('product.free_shipping')}
               </h3>
               <p className="text-text-secondary font-light leading-relaxed">
-                {language === 'ar' ? 'شحن سريع لجميع الولايات. توصيل في وقت قياسي.' : 'Expédition le jour même pour les commandes passées avant 14h. Livraison mondiale disponible.'}
-              </p>
-            </div>
-
-            <div className="p-8 border border-border-color hover:border-neon-blue/30 transition-colors group bg-bg-primary">
-              <div className="w-16 h-16 mx-auto bg-bg-secondary border border-border-color flex items-center justify-center mb-8 text-neon-blue group-hover:scale-110 transition-transform duration-300">
-                <Zap size={32} strokeWidth={1.5} />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-4 font-display uppercase tracking-wider">
-                {t('product.warranty')}
-              </h3>
-              <p className="text-text-secondary font-light leading-relaxed">
-                {language === 'ar' ? 'نحن نضمن جودة منتجاتنا. ضمان شامل على جميع لوحات المفاتيح.' : 'Nous garantissons nos produits. Garantie complète sur tous les claviers mécaniques.'}
+                {language === 'ar' ? 'التوصيل متوفر لجميع ولايات الوطن. سريع وموثوق.' : 'Livraison disponible dans toutes les wilayas du pays. Rapide et fiable.'}
               </p>
             </div>
           </div>

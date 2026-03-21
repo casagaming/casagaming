@@ -338,7 +338,9 @@ export default function ProductPage() {
           <div className="mb-8 border-t border-border-color pt-6">
             <h3 className="text-text-primary font-bold uppercase tracking-wider mb-4 font-mono text-sm">{t('product.description')}</h3>
             <p className="text-text-secondary leading-relaxed text-lg font-light border-l-2 border-border-color pl-6">
-              {language === 'ar' ? product.description_ar : (product.description_en || `Experience gaming like never before with the ${product.name}.`)}
+              {language === 'ar'
+                ? (product.description_ar || product.description_en || `Experience gaming like never before with the ${product.name}.`)
+                : (product.description_en || product.description_ar || `Experience gaming like never before with the ${product.name}.`)}
             </p>
           </div>
 
@@ -357,8 +359,8 @@ export default function ProductPage() {
                 <ShieldCheck size={24} strokeWidth={1.5} />
               </div>
               <div>
-                <h4 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-1">{t('product.warranty')}</h4>
-                <p className="text-xs text-text-secondary font-mono">{t('product.warranty_desc')}</p>
+                <h4 className="font-bold text-text-primary text-sm uppercase tracking-wider mb-1">{t('product.quality')}</h4>
+                <p className="text-xs text-text-secondary font-mono">{t('product.quality_desc')}</p>
               </div>
             </div>
           </div>
