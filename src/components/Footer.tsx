@@ -137,6 +137,17 @@ export default function Footer() {
             <a href="#" className="hover:text-text-primary transition-colors">{t('footer.terms')}</a>
           </div>
         </div>
+        <div className="mt-4 text-center text-xs text-text-secondary">
+          Made by{' '}
+          <a
+            href="https://www.instagram.com/wepnest/?hl=ar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-neon-blue hover:text-neon-purple transition-colors font-semibold"
+          >
+            wepnest
+          </a>
+        </div>
       </div>
     </footer>
   );
