@@ -66,12 +66,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <img
             src={product.image}
             alt={productName}
+            loading="lazy"
             className="w-full h-full object-cover transition-opacity duration-500 opacity-90 group-hover:opacity-100"
           />
           {product.hoverImage && (
              <img
                src={product.hoverImage}
                alt={productName}
+               loading="lazy"
                className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
              />
           )}

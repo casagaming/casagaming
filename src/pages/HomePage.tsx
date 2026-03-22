@@ -31,7 +31,7 @@ export default function HomePage() {
         );
 
         setNewArrivals(newResult.rows.filter((row: any) => row[6] === 1).slice(0, 6).map((row: any) => {
-          const images = parseImageUrl(row[5]);
+          const images = parseImageUrl(row[5], 400);
           return {
             id: row[0],
             name_en: row[1],
@@ -79,7 +79,7 @@ export default function HomePage() {
         })));
 
         setPopularProducts(popResult.rows.map((row: any) => {
-          const images = parseImageUrl(row[5]);
+          const images = parseImageUrl(row[5], 400);
           return {
             id: row[0],
             name_en: row[1],

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useState, useEffect } from 'react';
-import { turso } from '../lib/turso';
+import { turso, getOptimizedImageUrl } from '../lib/turso';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function CategoryGrid() {
@@ -68,8 +68,9 @@ export default function CategoryGrid() {
               <Link to={`/products?category=${encodeURIComponent(category.name_en)}`} className="group block relative h-64 overflow-hidden rounded-lg">
                 <div className="absolute inset-0 bg-gray-900">
                   <img
-                    src={category.image_url || 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=800&auto=format&fit=crop'}
+                    src={getOptimizedImageUrl(category.image_url || 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=800&auto=format&fit=crop', 400)}
                     alt={category.name_en}
+                    loading="lazy"
                     className="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
                   />
                 </div>

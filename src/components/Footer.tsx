@@ -32,7 +32,7 @@ export default function Footer() {
           <div>
             <Link to="/" className="flex items-center gap-2 mb-6">
               {config?.logo_url ? (
-                <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-10 w-auto object-contain" />
+                <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} loading="lazy" className="h-10 w-auto object-contain" />
               ) : (
                 <>
                   <div className="relative w-8 h-8 flex items-center justify-center">

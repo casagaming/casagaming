@@ -41,7 +41,7 @@ export default function CartPage() {
                 <div key={item.id} className="p-6 grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
                   <div className="sm:col-span-6 flex items-center gap-6">
                     <div className="w-24 h-24 bg-bg-primary border border-border-color overflow-hidden flex-shrink-0 group">
-                      <img src={item.selectedVariant?.image_url || item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                      <img src={item.selectedVariant?.image_url || item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                     </div>
                     <div>
                       <h3 className="font-bold text-text-primary text-lg font-display uppercase tracking-wide mb-1">

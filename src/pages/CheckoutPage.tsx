@@ -319,7 +319,7 @@ export default function CheckoutPage() {
                 <div key={(item as any).cartItemId} className="flex gap-4 items-center group">
                   <div className="w-16 h-16 bg-bg-primary border border-border-color relative flex-shrink-0">
                     <span className="absolute -top-2 -right-2 w-5 h-5 bg-neon-blue text-black text-xs font-bold flex items-center justify-center font-mono">{item.quantity}</span>
-                    <img src={(item as any).selectedVariant?.image_url || (item as any).image} alt={(item as any).name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <img src={(item as any).selectedVariant?.image_url || (item as any).image} alt={(item as any).name} loading="lazy" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-text-primary text-sm truncate font-display uppercase tracking-wide">

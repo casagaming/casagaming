@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { turso } from '../lib/turso';
+import { turso, getOptimizedImageUrl } from '../lib/turso';
 
 interface Category {
   id: string;
@@ -77,8 +77,9 @@ export default function CategoriesPage() {
                 >
                   <div className="absolute inset-0 z-10 w-full h-full rounded-[20px] overflow-hidden transition-all duration-300 ease-out group-hover:opacity-0 group-hover:invisible group-hover:-translate-y-3 group-hover:-translate-x-3">
                     <img
-                      src={category.image_url || 'https://images.unsplash.com/photo-1555617981-778dd1c43165?q=80&w=1000&auto=format&fit=crop'}
+                      src={getOptimizedImageUrl(category.image_url || 'https://images.unsplash.com/photo-1555617981-778dd1c43165?q=80&w=1000&auto=format&fit=crop', 600)}
                       alt={category.name_en}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40" />

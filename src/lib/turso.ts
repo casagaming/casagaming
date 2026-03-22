@@ -73,15 +73,27 @@ export const turso = { execute };
 
 export const isValidUrl = (url: any) => typeof url === 'string' && (url.startsWith('http') || url.startsWith('/'));
 
-export function parseImageUrl(value: any): string[] {
-  if (Array.isArray(value)) return value.filter(isValidUrl);
+export function getOptimizedImageUrl(url: string | null | undefined, width?: number): string {
+  if (!url) return '';
+  if (url.includes('cloudinary.com') && url.includes('/upload/')) {
+    const alreadyHasTransforms = /\/upload\/(?!v\d)[a-z_,0-9]+\//.test(url);
+    if (alreadyHasTransforms) return url;
+    const transforms = width ? `w_${width},c_scale,f_auto,q_auto` : 'f_auto,q_auto';
+    return url.replace('/upload/', `/upload/${transforms}/`);
+  }
+  return url;
+}
+
+export function parseImageUrl(value: any, width?: number): string[] {
+  const optimize = (u: string) => getOptimizedImageUrl(u, width);
+  if (Array.isArray(value)) return value.filter(isValidUrl).map(optimize);
   if (typeof value === 'string' && value) {
     try {
       const parsed = JSON.parse(value);
-      if (Array.isArray(parsed)) return parsed.filter(isValidUrl);
-      return isValidUrl(parsed) ? [parsed] : [];
+      if (Array.isArray(parsed)) return parsed.filter(isValidUrl).map(optimize);
+      return isValidUrl(parsed) ? [optimize(parsed)] : [];
     } catch {
-      return isValidUrl(value) ? [value] : [];
+      return isValidUrl(value) ? [optimize(value)] : [];
     }
   }
   return [];

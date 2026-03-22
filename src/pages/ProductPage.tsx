@@ -11,11 +11,11 @@ import { useConfig } from '../context/ConfigContext';
 import RelatedProductsSlider from '../components/RelatedProductsSlider';
 import { MessageSquare } from 'lucide-react';
 
-const getHighQualityUrl = (url: string | null | undefined) => {
+const getHighQualityUrl = (url: string | null | undefined, width = 800) => {
   if (!url) return '';
   if (url.includes('cloudinary.com') && url.includes('/upload/')) {
-    if (url.includes('/upload/q_')) return url;
-    return url.replace('/upload/', '/upload/q_100,f_auto/');
+    const stripped = url.replace(/\/upload\/(?!v\d+\/)([^/]+)\//, '/upload/');
+    return stripped.replace('/upload/', `/upload/w_${width},c_scale,f_auto,q_auto/`);
   }
   return url;
 };
@@ -216,7 +216,7 @@ export default function ProductPage() {
                     (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color hover:border-text-secondary'
                   }`}
                 >
-                  <img src={getHighQualityUrl(img)} alt={`${product.name} ${index + 1}`} className="w-full h-full object-cover" />
+                  <img src={getHighQualityUrl(img, 200)} alt={`${product.name} ${index + 1}`} loading="lazy" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -299,7 +299,7 @@ export default function ProductPage() {
                   </div>
                   <button
                     onClick={handleAddToCart}
-                    className="w-full sm:w-auto flex-1 bg-bg-secondary border border-border-color text-text-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-text-primary/10 transition-all flex items-center justify-center gap-3 group"
+                    className="w-full sm:w-auto flex-1 bg-neon-blue border-2 border-neon-blue text-black px-8 py-4 font-bold uppercase tracking-widest hover:bg-cyan-300 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 group"
                   >
                     <ShoppingCart size={20} className="group-hover:scale-110 transition-transform" /> {t('product.add_to_cart')}
                   </button>
@@ -309,7 +309,7 @@ export default function ProductPage() {
                         navigate('/checkout');
                       }
                     }}
-                    className="w-full sm:w-auto flex-1 bg-text-primary text-bg-primary px-8 py-4 font-bold uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all flex items-center justify-center gap-3 group"
+                    className="w-full sm:w-auto flex-1 bg-neon-blue text-black px-8 py-4 font-bold uppercase tracking-widest hover:bg-cyan-300 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(0,243,255,0.4)] hover:shadow-[0_0_30px_rgba(0,243,255,0.7)]"
                   >
                     {t('product.buy_now')}
                   </button>

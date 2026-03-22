@@ -1,14 +1,15 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import MobileBottomNav from './components/MobileBottomNav';
-import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ScrollToTop from './components/ScrollToTop';
 import { LanguageProvider } from './context/LanguageContext';
 import { ConfigProvider } from './context/ConfigContext';
 import { ToastProvider } from './context/ToastContext';
 import { CartProvider } from './context/CartContext';
+
+const Footer = lazy(() => import('./components/Footer'));
+const MobileBottomNav = lazy(() => import('./components/MobileBottomNav'));
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CatalogPage = lazy(() => import('./pages/CatalogPage'));
@@ -46,8 +47,10 @@ export default function App() {
                   </Suspense>
                 </main>
 
-                <Footer />
-                <MobileBottomNav />
+                <Suspense fallback={null}>
+                  <Footer />
+                  <MobileBottomNav />
+                </Suspense>
               </div>
             </Router>
           </CartProvider>

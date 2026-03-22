@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { turso } from '../lib/turso';
+import { turso, getOptimizedImageUrl } from '../lib/turso';
 
 const styleMapping: any = {
   0: { bg: 'bg-bg-secondary', text: 'text-text-primary', accent: 'border-neon-blue', buttonBg: 'bg-neon-blue', buttonText: 'text-black', subtitle: 'PRECISION CONTROL' },
@@ -52,8 +52,9 @@ export default function CategoryShowcase() {
               >
                 <div className="absolute inset-0 z-10 w-full h-full rounded-[20px] overflow-hidden transition-all duration-300 ease-out group-hover:opacity-0 group-hover:invisible group-hover:-translate-y-3 group-hover:-translate-x-3">
                   <img
-                    src={category.image_url}
+                    src={getOptimizedImageUrl(category.image_url, 800)}
                     alt={language === 'ar' ? category.name_ar : category.name_en}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/30" />

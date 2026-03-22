@@ -32,7 +32,7 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
         });
 
         const formatted = result.rows.map((row: any) => {
-          const images = parseImageUrl(row[5]);
+          const images = parseImageUrl(row[5], 400);
           return {
             id: row[0],
             name_ar: row[2],
