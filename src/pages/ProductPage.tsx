@@ -42,11 +42,8 @@ export default function ProductPage() {
   }, [product?.images?.length]);
 
   useEffect(() => {
-    if (product?.images?.length > 1) {
-      const interval = setInterval(nextImage, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [nextImage, product?.images?.length]);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [id]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -337,7 +334,7 @@ export default function ProductPage() {
 
           <div className="mb-8 border-t border-border-color pt-6">
             <h3 className="text-text-primary font-bold uppercase tracking-wider mb-4 font-mono text-sm">{t('product.description')}</h3>
-            <p className="text-text-secondary leading-relaxed text-lg font-light border-l-2 border-border-color pl-6">
+            <p className="text-text-secondary leading-relaxed text-base whitespace-pre-wrap">
               {language === 'ar'
                 ? (product.description_ar || product.description_en || `Experience gaming like never before with the ${product.name}.`)
                 : (product.description_en || product.description_ar || `Experience gaming like never before with the ${product.name}.`)}

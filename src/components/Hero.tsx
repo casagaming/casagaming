@@ -32,7 +32,7 @@ export default function Hero() {
 
   if (images.length === 0) {
     return (
-      <div className="relative h-[35vh] md:h-screen w-full overflow-hidden bg-bg-primary transition-colors duration-300">
+      <div className="relative h-[30vh] md:h-[55vh] w-full overflow-hidden bg-bg-primary transition-colors duration-300">
         <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function Hero() {
   }
 
   return (
-    <div className="relative h-[35vh] md:h-screen w-full overflow-hidden bg-bg-primary transition-colors duration-300">
+    <div className="relative h-[30vh] md:h-[55vh] w-full overflow-hidden bg-bg-primary transition-colors duration-300">
       <div className="absolute inset-0">
         <AnimatePresence mode="popLayout">
           <motion.img
