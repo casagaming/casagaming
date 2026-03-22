@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { turso, getOptimizedImageUrl } from '../lib/turso';
 
@@ -13,6 +13,7 @@ interface Category {
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const { language, t, isRTL } = useLanguage();
 
@@ -50,25 +51,56 @@ export default function CategoriesPage() {
     return styles[index % styles.length];
   };
 
+  const filteredCategories = categories.filter(cat => {
+    const name = language === 'ar' ? cat.name_ar : cat.name_en;
+    return name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
   return (
     <div className={`pt-32 pb-20 px-4 bg-bg-primary min-h-screen ${isRTL ? 'text-right' : 'text-left'}`}>
       <div className="max-w-[1600px] mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h1 className="text-5xl md:text-7xl font-bold text-text-primary mb-6 font-display uppercase tracking-tighter">
             {t('categories.title')}
           </h1>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto mb-8">
             {t('categories.desc')}
           </p>
+
+          <div className={`relative max-w-md mx-auto`}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder={t('categories.search')}
+              className={`w-full px-5 py-3 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-sm uppercase ${isRTL ? 'pr-12 pl-5' : 'pl-12 pr-5'}`}
+            />
+            <Search
+              size={18}
+              className={`absolute top-1/2 -translate-y-1/2 text-text-secondary ${isRTL ? 'right-4' : 'left-4'}`}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
-          {loading ? (
-            [1, 2, 3, 4].map(i => (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+            {[1, 2, 3, 4].map(i => (
               <div key={i} className="w-full h-[400px] md:h-[500px] rounded-[20px] bg-bg-secondary animate-pulse" />
-            ))
-          ) : (
-            categories.map((category, index) => {
+            ))}
+          </div>
+        ) : filteredCategories.length === 0 ? (
+          <div className="text-center py-20 border border-dashed border-border-color">
+            <p className="text-text-secondary text-lg font-mono uppercase mb-4">{t('categories.not_found')}</p>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-neon-blue hover:text-white font-bold uppercase tracking-wider border-b border-neon-blue hover:border-white transition-all pb-1"
+            >
+              {language === 'ar' ? 'مسح البحث' : 'Effacer la recherche'}
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+            {filteredCategories.map((category, index) => {
               const style = getCategoryStyles(index);
               return (
                 <div
@@ -105,9 +137,9 @@ export default function CategoriesPage() {
                   </div>
                 </div>
               );
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

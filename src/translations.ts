@@ -80,6 +80,27 @@ export const translations = {
     'categories.title': 'Toutes les Catégories',
     'categories.desc': 'Explorez notre collection complète de matériel de jeu haut de gamme, méticuleusement organisée pour votre installation parfaite.',
 
+    // Sort
+    'sort.label': 'Trier par',
+    'sort.default': 'Par défaut',
+    'sort.price_high_low': 'Prix : élevé → bas',
+    'sort.price_low_high': 'Prix : bas → élevé',
+
+    // Filters
+    'filter.price_range': 'Prix (DA)',
+    'filter.min': 'Min',
+    'filter.max': 'Max',
+    'filter.new_only': 'Nouveautés',
+    'filter.sale_only': 'En solde',
+    'filter.in_stock': 'En stock',
+    'filter.active': 'Filtres actifs',
+    'filter.clear_all': 'Tout effacer',
+    'filter.results': 'résultats',
+
+    // Categories filter
+    'categories.search': 'Rechercher une catégorie...',
+    'categories.not_found': 'Aucune catégorie trouvée.',
+
     // Common
     'common.loading': 'Chargement...',
     'common.error': 'Une erreur est survenue',
@@ -164,6 +185,27 @@ export const translations = {
     // Categories
     'categories.title': 'كل التصنيفات',
     'categories.desc': 'استكشف مجموعتنا الكاملة من معدات الألعاب الممتازة، المنظمة بعناية لتناسب إعدادك المثالي.',
+
+    // Sort
+    'sort.label': 'ترتيب حسب',
+    'sort.default': 'الافتراضي',
+    'sort.price_high_low': 'السعر: من الأغلى للأرخص',
+    'sort.price_low_high': 'السعر: من الأرخص للأغلى',
+
+    // Filters
+    'filter.price_range': 'السعر (دج)',
+    'filter.min': 'الأدنى',
+    'filter.max': 'الأعلى',
+    'filter.new_only': 'جديد',
+    'filter.sale_only': 'عروض',
+    'filter.in_stock': 'متوفر',
+    'filter.active': 'الفلاتر النشطة',
+    'filter.clear_all': 'مسح الكل',
+    'filter.results': 'نتيجة',
+
+    // Categories filter
+    'categories.search': 'ابحث عن صنف...',
+    'categories.not_found': 'لا توجد أصناف مطابقة.',
 
     // Common
     'common.loading': 'جاري التحميل...',
