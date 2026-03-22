@@ -55,6 +55,7 @@ export default function CategoryShowcase() {
                     src={getOptimizedImageUrl(category.image_url, 800)}
                     alt={language === 'ar' ? category.name_ar : category.name_en}
                     loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/30" />

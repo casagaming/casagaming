@@ -5,19 +5,14 @@ import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { turso, parseImageUrl, isValidUrl } from '../lib/turso';
+import { turso, parseImageUrl, isValidUrl, getOptimizedImageUrl } from '../lib/turso';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useConfig } from '../context/ConfigContext';
 import RelatedProductsSlider from '../components/RelatedProductsSlider';
 import { MessageSquare } from 'lucide-react';
 
-const getHighQualityUrl = (url: string | null | undefined, width = 800) => {
-  if (!url) return '';
-  if (url.includes('cloudinary.com') && url.includes('/upload/')) {
-    const stripped = url.replace(/\/upload\/(?!v\d+\/)([^/]+)\//, '/upload/');
-    return stripped.replace('/upload/', `/upload/w_${width},c_scale,f_auto,q_auto/`);
-  }
-  return url;
+const getHighQualityUrl = (url: string | null | undefined, width = 900) => {
+  return getOptimizedImageUrl(url, width);
 };
 
 export default function ProductPage() {

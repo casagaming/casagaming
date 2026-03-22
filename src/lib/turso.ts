@@ -4,6 +4,9 @@ const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOj
 const isDev = import.meta.env.DEV;
 const API_BASE = isDev ? '/api/turso' : TURSO_DIRECT_URL;
 
+const queryCache = new Map<string, { data: TursoResult; ts: number }>();
+const CACHE_TTL = 5 * 60 * 1000;
+
 function encodeTursoArg(val: any) {
   if (val === null || val === undefined) return { type: 'null' };
   if (typeof val === 'number' && Number.isInteger(val)) return { type: 'integer', value: String(val) };
@@ -22,6 +25,16 @@ export async function execute(
 ): Promise<TursoResult> {
   const sql = typeof sqlOrObj === 'string' ? sqlOrObj : sqlOrObj.sql;
   const args = typeof sqlOrObj === 'string' ? (plainArgs || []) : (sqlOrObj.args || []);
+
+  const isReadOnly = /^\s*SELECT\s/i.test(sql);
+  const cacheKey = isReadOnly ? `${sql}::${JSON.stringify(args)}` : '';
+
+  if (isReadOnly && cacheKey) {
+    const cached = queryCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      return cached.data;
+    }
+  }
 
   const response = await fetch(`${API_BASE}/v2/pipeline`, {
     method: 'POST',
@@ -66,7 +79,13 @@ export async function execute(
     })
   );
 
-  return { columns, rows };
+  const tursoResult: TursoResult = { columns, rows };
+
+  if (isReadOnly && cacheKey) {
+    queryCache.set(cacheKey, { data: tursoResult, ts: Date.now() });
+  }
+
+  return tursoResult;
 }
 
 export const turso = { execute };
@@ -76,9 +95,22 @@ export const isValidUrl = (url: any) => typeof url === 'string' && (url.startsWi
 export function getOptimizedImageUrl(url: string | null | undefined, width?: number): string {
   if (!url) return '';
   if (url.includes('cloudinary.com') && url.includes('/upload/')) {
-    const alreadyHasTransforms = /\/upload\/(?!v\d)[a-z_,0-9]+\//.test(url);
+    const alreadyHasTransforms = /\/upload\/(?!v\d)[a-z_,0-9:]+\//.test(url);
     if (alreadyHasTransforms) return url;
-    const transforms = width ? `w_${width},c_scale,f_auto,q_auto` : 'f_auto,q_auto';
+
+    let quality: string;
+    if (!width) {
+      quality = 'q_auto';
+    } else if (width >= 800) {
+      quality = 'q_auto:best';
+    } else {
+      quality = 'q_auto:eco';
+    }
+
+    const transforms = width
+      ? `f_auto,${quality},w_${width},c_fill`
+      : `f_auto,${quality}`;
+
     return url.replace('/upload/', `/upload/${transforms}/`);
   }
   return url;

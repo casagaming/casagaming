@@ -68,6 +68,26 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
+              return 'three';
+            }
+            if (id.includes('node_modules/react-dom')) {
+              return 'react-dom';
+            }
+            if (id.includes('node_modules/react-router-dom') || id.includes('node_modules/react-router')) {
+              return 'router';
+            }
+            if (id.includes('node_modules/motion') || id.includes('node_modules/framer-motion')) {
+              return 'motion';
+            }
+          },
+        },
+      },
+    },
     server: {
       host: '0.0.0.0',
       port: 5000,

@@ -19,91 +19,51 @@ export default function HomePage() {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const newResult = await turso.execute(
-          `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
-                  p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
-                  c.name_en AS category_name_en, c.name_ar AS category_name_ar,
-                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
-           FROM products p
-           LEFT JOIN categories c ON p.category_id = c.id
-           WHERE p.is_new = 1
-           LIMIT 6`
-        );
+        const [newResult, popResult, catsResult] = await Promise.all([
+          turso.execute(
+            `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
+                    p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
+                    c.name_en AS category_name_en, c.name_ar AS category_name_ar,
+                    (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
+             FROM products p
+             LEFT JOIN categories c ON p.category_id = c.id
+             WHERE p.is_new = 1
+             LIMIT 6`
+          ),
+          turso.execute(
+            `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
+                    p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
+                    c.name_en AS category_name_en, c.name_ar AS category_name_ar,
+                    (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
+             FROM products p
+             LEFT JOIN categories c ON p.category_id = c.id
+             ORDER BY p.reviews_count DESC
+             LIMIT 12`
+          ),
+          turso.execute('SELECT id, name_ar, name_en, image_url FROM categories LIMIT 10'),
+        ]);
 
-        setNewArrivals(newResult.rows.filter((row: any) => row[6] === 1).slice(0, 6).map((row: any) => {
+        const mapProduct = (row: any) => {
           const images = parseImageUrl(row[5], 400);
           return {
-            id: row[0],
-            name_en: row[1],
-            name_ar: row[2],
-            price: row[3],
-            original_price: row[4],
-            image_url: row[5],
-            is_new: row[6],
-            is_sale: row[7],
-            stock: row[8],
-            rating: row[9],
-            reviews_count: row[10],
-            category_en: row[11],
-            category_ar: row[12],
+            id: row[0], name_en: row[1], name_ar: row[2],
+            price: row[3], original_price: row[4], image_url: row[5],
+            is_new: row[6], is_sale: row[7], stock: row[8],
+            rating: row[9], reviews_count: row[10],
+            category_en: row[11], category_ar: row[12],
             name: language === 'ar' ? row[2] : row[1],
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,
-            images,
-            isNew: row[6],
-            isSale: row[7],
-            originalPrice: row[4],
+            images, isNew: row[6], isSale: row[7], originalPrice: row[4],
             variants_count: row[13],
           };
-        }));
+        };
 
-        const popResult = await turso.execute(
-          `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
-                  p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
-                  c.name_en AS category_name_en, c.name_ar AS category_name_ar,
-                  (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
-           FROM products p
-           LEFT JOIN categories c ON p.category_id = c.id
-           ORDER BY p.reviews_count DESC
-           LIMIT 12`
-        );
-
-        const catsResult = await turso.execute(
-          'SELECT id, name_ar, name_en, image_url FROM categories LIMIT 10'
-        );
+        setNewArrivals(newResult.rows.filter((row: any) => row[6] === 1).slice(0, 6).map(mapProduct));
+        setPopularProducts(popResult.rows.map(mapProduct));
         setCategories(catsResult.rows.map((row: any) => ({
-          id: row[0],
-          name_ar: row[1],
-          name_en: row[2],
-          image_url: row[3],
+          id: row[0], name_ar: row[1], name_en: row[2], image_url: row[3],
         })));
-
-        setPopularProducts(popResult.rows.map((row: any) => {
-          const images = parseImageUrl(row[5], 400);
-          return {
-            id: row[0],
-            name_en: row[1],
-            name_ar: row[2],
-            price: row[3],
-            original_price: row[4],
-            image_url: row[5],
-            is_new: row[6],
-            is_sale: row[7],
-            stock: row[8],
-            rating: row[9],
-            reviews_count: row[10],
-            category_en: row[11],
-            category_ar: row[12],
-            name: language === 'ar' ? row[2] : row[1],
-            image: images[0],
-            hoverImage: images.length > 1 ? images[1] : undefined,
-            images,
-            isNew: row[6],
-            isSale: row[7],
-            originalPrice: row[4],
-            variants_count: row[13],
-          };
-        }));
       } catch (error) {
         console.error('Error fetching home data:', error);
       }
