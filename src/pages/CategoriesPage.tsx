@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { turso, getOptimizedImageUrl } from '../lib/turso';
 
@@ -40,16 +40,6 @@ export default function CategoriesPage() {
 
     fetchCategories();
   }, []);
-
-  const getCategoryStyles = (index: number) => {
-    const styles = [
-      { bg: 'bg-bg-secondary', text: 'text-text-primary', accent: 'border-neon-blue', btnBg: 'bg-neon-blue', btnText: 'text-black' },
-      { bg: 'bg-neon-blue', text: 'text-black', accent: 'border-black', btnBg: 'bg-black', btnText: 'text-neon-blue' },
-      { bg: 'bg-bg-primary', text: 'text-text-primary', accent: 'border-neon-purple', btnBg: 'bg-neon-purple', btnText: 'text-white' },
-      { bg: 'bg-neon-purple', text: 'text-white', accent: 'border-black', btnBg: 'bg-black', btnText: 'text-neon-purple' },
-    ];
-    return styles[index % styles.length];
-  };
 
   const filteredCategories = categories.filter(cat => {
     const name = language === 'ar' ? cat.name_ar : cat.name_en;
@@ -100,44 +90,26 @@ export default function CategoriesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
-            {filteredCategories.map((category, index) => {
-              const style = getCategoryStyles(index);
-              return (
-                <div
-                  key={category.id}
-                  className="group relative w-full h-[400px] md:h-[500px] rounded-[20px] bg-black"
-                >
-                  <div className="absolute inset-0 z-10 w-full h-full rounded-[20px] overflow-hidden transition-all duration-300 ease-out group-hover:opacity-0 group-hover:invisible group-hover:-translate-y-3 group-hover:-translate-x-3">
-                    <img
-                      src={getOptimizedImageUrl(category.image_url || 'https://images.unsplash.com/photo-1555617981-778dd1c43165?q=80&w=1000&auto=format&fit=crop', 600)}
-                      alt={category.name_en}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40" />
-                    <div className={`absolute bottom-8 ${isRTL ? 'right-8' : 'left-8'}`}>
-                      <h3 className="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tighter">
-                        {language === 'ar' ? category.name_ar : category.name_en}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className={`absolute inset-0 z-20 w-full h-full rounded-[20px] flex flex-col items-center justify-center text-center p-6 transition-all duration-300 ease-out opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:-translate-y-3 group-hover:-translate-x-3 ${style.bg} border-2 ${style.accent}`}>
-                    <h3 className={`text-3xl md:text-4xl font-display font-black uppercase tracking-tighter mb-4 ${style.text} leading-[0.9]`}>
-                      {language === 'ar' ? category.name_ar : category.name_en}
-                    </h3>
-                    <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-                      <Link
-                        to={`/products?category=${encodeURIComponent(category.name_en)}`}
-                        className={`inline-flex items-center gap-2 px-6 py-3 text-sm rounded-full font-bold uppercase tracking-wider transition-transform hover:scale-105 ${style.btnBg} ${style.btnText}`}
-                      >
-                        {language === 'ar' ? 'عرض المنتجات' : 'Voir les produits'} <ArrowRight size={16} className={isRTL ? 'rotate-180' : ''} />
-                      </Link>
-                    </div>
-                  </div>
+            {filteredCategories.map((category) => (
+              <Link
+                key={category.id}
+                to={`/products?category=${encodeURIComponent(category.name_en)}`}
+                className="group relative w-full h-[400px] md:h-[500px] rounded-[20px] overflow-hidden bg-black block"
+              >
+                <img
+                  src={getOptimizedImageUrl(category.image_url || 'https://images.unsplash.com/photo-1555617981-778dd1c43165?q=80&w=1000&auto=format&fit=crop', 600)}
+                  alt={category.name_en}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className={`absolute bottom-8 ${isRTL ? 'right-8' : 'left-8'}`}>
+                  <h3 className="text-3xl md:text-4xl font-display font-bold text-white uppercase tracking-tighter group-hover:text-neon-blue transition-colors duration-300">
+                    {language === 'ar' ? category.name_ar : category.name_en}
+                  </h3>
                 </div>
-              );
-            })}
+              </Link>
+            ))}
           </div>
         )}
       </div>
