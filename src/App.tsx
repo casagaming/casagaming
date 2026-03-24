@@ -9,7 +9,6 @@ import { ToastProvider } from './context/ToastContext';
 import { CartProvider } from './context/CartContext';
 
 const Footer = lazy(() => import('./components/Footer'));
-const MobileBottomNav = lazy(() => import('./components/MobileBottomNav'));
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const CatalogPage = lazy(() => import('./pages/CatalogPage'));
@@ -49,7 +48,6 @@ export default function App() {
 
                 <Suspense fallback={null}>
                   <Footer />
-                  <MobileBottomNav />
                 </Suspense>
               </div>
             </Router>

@@ -186,12 +186,12 @@ export default function ProductPage() {
   }, [product, language]);
 
   if (loading) {
-    return <div className="pt-36 pb-20"><LoadingSpinner /></div>;
+    return <div className="pt-20 pb-20"><LoadingSpinner /></div>;
   }
 
   if (!product) {
     return (
-      <div className="pt-36 pb-20 text-center">
+      <div className="pt-20 pb-20 text-center">
         <h2 className="text-2xl font-bold text-gray-900">{t('common.error')}</h2>
         <Link to="/products" className="text-neon-blue hover:underline mt-4 inline-block">
           {t('product.back')}
@@ -219,7 +219,7 @@ export default function ProductPage() {
   };
 
   return (
-    <div className={`pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'font-arabic' : ''}`}>
       <Link to="/products" className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary mb-8 transition-colors font-mono uppercase text-sm tracking-wider">
         <ArrowLeft size={16} className={isRTL ? 'rotate-180' : ''} /> {t('product.back')}
       </Link>

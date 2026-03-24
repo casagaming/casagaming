@@ -9,7 +9,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center min-h-[60vh] flex flex-col justify-center items-center">
+      <div className="pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center min-h-[60vh] flex flex-col justify-center items-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 font-display uppercase tracking-tighter">{t('cart.empty')}</h1>
         <p className="text-gray-400 mb-10 font-mono text-lg">
           {language === 'ar' ? 'يبدو أنك لم تضف أي شيء إلى سلتك بعد.' : 'Il semble que vous n\'ayez encore rien ajouté à votre panier.'}
@@ -22,7 +22,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className={`pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto ${isRTL ? 'text-right' : 'text-left'}`}>
+    <div className={`pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto ${isRTL ? 'text-right' : 'text-left'}`}>
       <h1 className="text-4xl md:text-5xl font-bold text-white mb-12 font-display uppercase tracking-tighter">{t('cart.title')}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

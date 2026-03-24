@@ -133,7 +133,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && !isSubmitting) {
     return (
-      <div className="pt-36 pb-20 text-center min-h-[60vh] flex flex-col justify-center items-center">
+      <div className="pt-20 pb-20 text-center min-h-[60vh] flex flex-col justify-center items-center">
         <h2 className="text-4xl font-bold text-text-primary font-display uppercase tracking-tighter mb-6">{t('cart.empty')}</h2>
         <Link to="/products" className="text-neon-blue hover:text-text-primary font-mono uppercase tracking-widest border-b border-neon-blue hover:border-text-primary transition-all pb-1">
           {language === 'ar' ? 'ابدأ التسوق' : 'Commencer les achats'}
@@ -143,7 +143,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className={`pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
+    <div className={`pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <form onSubmit={handleConfirmOrder}>
           <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-10 font-display uppercase tracking-tighter">{t('checkout.title')}</h1>

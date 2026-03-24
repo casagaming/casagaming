@@ -67,12 +67,12 @@ export default function OrderReceivedPage() {
   }, [orderId]);
 
   if (loading) {
-    return <div className="pt-36 pb-20 min-h-screen bg-bg-primary"><LoadingSpinner /></div>;
+    return <div className="pt-20 pb-20 min-h-screen bg-bg-primary"><LoadingSpinner /></div>;
   }
 
   if (!order) {
     return (
-      <div className={`pt-36 pb-20 px-4 text-center min-h-screen bg-bg-primary flex flex-col justify-center items-center ${isRTL ? 'text-right' : ''}`}>
+      <div className={`pt-20 pb-20 px-4 text-center min-h-screen bg-bg-primary flex flex-col justify-center items-center ${isRTL ? 'text-right' : ''}`}>
         <h2 className="text-3xl font-bold text-text-primary font-display uppercase tracking-tighter mb-4">{t('order.not_found')}</h2>
         <p className="text-text-secondary mb-8">{t('order.not_found_desc')}</p>
         <Link to="/" className="bg-text-primary text-bg-primary px-8 py-3 font-bold uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all">
@@ -83,7 +83,7 @@ export default function OrderReceivedPage() {
   }
 
   return (
-    <div className={`pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto transition-colors duration-300 min-h-screen bg-bg-primary ${isRTL ? 'text-right' : ''}`}>
+    <div className={`pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto transition-colors duration-300 min-h-screen bg-bg-primary ${isRTL ? 'text-right' : ''}`}>
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-neon-blue/10 rounded-full mb-6 border-2 border-neon-blue/20">
           <CheckCircle size={40} className="text-neon-blue" />

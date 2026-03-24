@@ -28,7 +28,7 @@ export default function AboutUsPage() {
   };
 
   return (
-    <div className="pt-24 pb-20 bg-bg-primary min-h-screen">
+    <div className="pt-20 pb-20 bg-bg-primary min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[40vh] md:h-[50vh] overflow-hidden flex items-center justify-center">
         <div className="absolute inset-0 bg-[url('https://res.cloudinary.com/dwgp11ukd/image/upload/f_auto,q_auto/v1772992306/alexander-swoboda-pc9_ke2pxf.jpg')] bg-cover bg-center opacity-20 scale-110" />

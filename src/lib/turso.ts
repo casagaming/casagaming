@@ -103,9 +103,10 @@ export function slugify(text: string): string {
 }
 
 export function productSlug(nameEn: string, id: string): string {
-  const slug = slugify(nameEn);
+  const words = slugify(nameEn).split('-').filter(Boolean);
+  const shortSlug = words.slice(0, 4).join('-');
   const shortId = id.slice(0, 8);
-  return `${slug}-${shortId}`;
+  return `${shortSlug}-${shortId}`;
 }
 
 export function extractIdPrefixFromSlug(slug: string): { idPrefix: string; isFullId: boolean } {

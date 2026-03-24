@@ -10,8 +10,9 @@ import { useLanguage } from '../context/LanguageContext';
 const NAV_LINKS = [
   { labelFr: 'Accueil', labelAr: 'الرئيسية', href: '/' },
   { labelFr: 'Tous les produits', labelAr: 'كل المنتجات', href: '/products' },
-  { labelFr: 'Clavier', labelAr: 'كلافيي', href: '/products?category=KEYBORDS' },
-  { labelFr: 'Accessoire clavier', labelAr: 'اكسسوار كلافيي', href: '/products?category=KEYCAPS' },
+  { labelFr: 'KEYBORDS', labelAr: 'KEYBORDS', href: '/products?category=KEYBORDS' },
+  { labelFr: 'KEYCAPS', labelAr: 'KEYCAPS', href: '/products?category=KEYCAPS' },
+  { labelFr: 'À Propos', labelAr: 'من نحن', href: '/about' },
 ];
 
 export default function Navbar() {
@@ -45,36 +46,37 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
   }, [location]);
 
   return (
     <>
       {/* Main top bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-bg-primary/95 backdrop-blur-md border-b border-border-color transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
 
             {/* Hamburger - mobile only */}
             <button
-              className="lg:hidden p-2 text-text-primary hover:text-neon-blue transition-colors"
+              className="lg:hidden p-2 -ml-1 text-text-primary hover:text-neon-blue transition-colors flex-shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <Menu size={24} />
+              <Menu size={22} />
             </button>
 
             {/* Logo */}
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2 group">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2 group lg:mr-8">
               {config?.logo_url ? (
-                <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-10 w-auto object-contain" />
+                <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-8 sm:h-10 w-auto object-contain" />
               ) : (
-                <span className="font-display font-bold text-2xl tracking-tighter leading-none text-text-primary group-hover:text-neon-blue transition-colors duration-300">
+                <span className="font-display font-bold text-xl sm:text-2xl tracking-tighter leading-none text-text-primary group-hover:text-neon-blue transition-colors duration-300">
                   CASA<span className="text-neon-blue">GAMING</span>
                 </span>
               )}
             </Link>
 
             {/* Desktop inline nav links */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-8 flex-1">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
@@ -91,41 +93,19 @@ export default function Navbar() {
             </div>
 
             {/* Right actions */}
-            <div className="flex items-center gap-4">
-              {/* Search */}
-              <div className="relative flex items-center">
-                <AnimatePresence>
-                  {isSearchOpen && (
-                    <motion.form
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: 180, opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      onSubmit={handleSearchSubmit}
-                      className="absolute right-8 top-1/2 -translate-y-1/2 overflow-hidden"
-                    >
-                      <input
-                        type="text"
-                        placeholder={t('nav.search')}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-transparent border-b border-border-color py-1 px-0 text-sm text-text-primary focus:outline-none focus:border-neon-blue font-mono uppercase placeholder:text-text-secondary"
-                        autoFocus
-                      />
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-                <button
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className={`text-text-secondary hover:text-text-primary transition-colors ${isSearchOpen ? 'text-neon-blue' : ''}`}
-                >
-                  <Search size={20} />
-                </button>
-              </div>
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Search icon - on mobile expands full-width bar below */}
+              <button
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                className={`p-1.5 transition-colors flex-shrink-0 ${isSearchOpen ? 'text-neon-blue' : 'text-text-secondary hover:text-text-primary'}`}
+              >
+                <Search size={20} />
+              </button>
 
-              {/* Theme */}
+              {/* Theme toggle - always visible */}
               <button
                 onClick={toggleTheme}
-                className="text-text-secondary hover:text-text-primary transition-colors"
+                className="p-1.5 text-text-secondary hover:text-text-primary transition-colors flex-shrink-0"
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
@@ -133,13 +113,13 @@ export default function Navbar() {
               {/* Language */}
               <button
                 onClick={() => setLanguage(language === 'fr' ? 'ar' : 'fr')}
-                className="text-text-secondary hover:text-text-primary transition-colors font-mono font-bold text-sm border border-border-color px-2 py-0.5 rounded hover:border-neon-blue"
+                className="text-text-secondary hover:text-text-primary transition-colors font-mono font-bold text-xs border border-border-color px-1.5 py-0.5 rounded hover:border-neon-blue flex-shrink-0"
               >
                 {language === 'fr' ? 'AR' : 'FR'}
               </button>
 
               {/* Cart */}
-              <Link to="/cart" className="relative text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5">
+              <Link to="/cart" className="relative p-1.5 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1 flex-shrink-0">
                 <ShoppingCart size={20} />
                 {cartCount > 0 && (
                   <span className="font-mono text-xs font-bold text-neon-blue">[{cartCount}]</span>
@@ -149,24 +129,41 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Secondary sticky inline nav - always visible on all screens */}
-        <div className="border-t border-border-color bg-bg-primary/95 overflow-x-auto scrollbar-hide">
-          <div className={`flex items-center gap-0 max-w-7xl mx-auto ${isRTL ? 'flex-row-reverse' : ''}`}>
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`flex-shrink-0 px-5 py-2.5 text-xs font-mono font-bold uppercase tracking-widest border-b-2 transition-all duration-200 whitespace-nowrap ${
-                  isActive(link.href)
-                    ? 'text-neon-blue border-neon-blue bg-neon-blue/5'
-                    : 'text-text-secondary border-transparent hover:text-text-primary hover:border-border-color'
-                }`}
-              >
-                {language === 'ar' ? link.labelAr : link.labelFr}
-              </Link>
-            ))}
-          </div>
-        </div>
+        {/* Full-width search bar - drops below navbar when active */}
+        <AnimatePresence>
+          {isSearchOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="border-t border-border-color bg-bg-primary overflow-hidden"
+            >
+              <form onSubmit={handleSearchSubmit} className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 flex items-center gap-2">
+                <Search size={16} className="text-text-secondary flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder={t('nav.search')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1 bg-transparent py-1 text-sm text-text-primary focus:outline-none font-mono uppercase placeholder:text-text-secondary"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button type="button" onClick={() => setSearchQuery('')} className="text-text-secondary hover:text-text-primary flex-shrink-0">
+                    <X size={16} />
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  className="flex-shrink-0 px-3 py-1 bg-neon-blue text-black text-xs font-bold uppercase tracking-wider"
+                >
+                  {language === 'ar' ? 'بحث' : 'Go'}
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Mobile Drawer */}
@@ -188,13 +185,14 @@ export default function Navbar() {
               className={`fixed top-0 bottom-0 w-full max-w-xs bg-bg-primary z-50 lg:hidden overflow-y-auto ${isRTL ? 'right-0 border-l' : 'left-0 border-r'} border-border-color`}
             >
               <div className="p-6 h-full flex flex-col">
-                <div className="flex items-center justify-between mb-12">
+                <div className="flex items-center justify-between mb-10">
                   <span className="font-display font-bold text-xl text-text-primary">CASA<span className="text-neon-blue">GAMING</span></span>
                   <button onClick={() => setIsMobileMenuOpen(false)} className="text-text-secondary hover:text-text-primary">
                     <X size={24} />
                   </button>
                 </div>
-                <div className="flex flex-col space-y-8 flex-1">
+
+                <div className="flex flex-col space-y-7 flex-1">
                   {NAV_LINKS.map((link) => (
                     <Link
                       key={link.href}
@@ -208,7 +206,8 @@ export default function Navbar() {
                     </Link>
                   ))}
                 </div>
-                <div className="mt-auto pt-8 border-t border-border-color">
+
+                <div className="mt-auto pt-8 border-t border-border-color flex items-center justify-between">
                   <Link
                     to="/cart"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -217,6 +216,12 @@ export default function Navbar() {
                     <ShoppingCart size={18} />
                     {language === 'ar' ? 'السلة' : 'Panier'} {cartCount > 0 && `[${cartCount}]`}
                   </Link>
+                  <button
+                    onClick={toggleTheme}
+                    className="p-2 text-text-secondary hover:text-text-primary transition-colors"
+                  >
+                    {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                  </button>
                 </div>
               </div>
             </motion.div>
