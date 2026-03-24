@@ -2,24 +2,19 @@ import { useState, useEffect } from 'react';
 import Hero from '../components/Hero';
 import ProductGrid from '../components/ProductGrid';
 import Marquee from '../components/Marquee';
-import CategoryShowcase from '../components/CategoryShowcase';
-import CategoryGrid from '../components/CategoryGrid';
-import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Truck } from 'lucide-react';
+import { ShieldCheck, Truck } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { turso, parseImageUrl } from '../lib/turso';
-import { motion } from 'motion/react';
 
 export default function HomePage() {
   const [newArrivals, setNewArrivals] = useState<any[]>([]);
   const [popularProducts, setPopularProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const { language, t, isRTL } = useLanguage();
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const [newResult, popResult, catsResult] = await Promise.all([
+        const [newResult, popResult] = await Promise.all([
           turso.execute(
             `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                     p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
@@ -37,10 +32,10 @@ export default function HomePage() {
                     (SELECT COUNT(*) FROM product_variants WHERE product_id = p.id) as variants_count
              FROM products p
              LEFT JOIN categories c ON p.category_id = c.id
+             WHERE p.is_featured = 1
              ORDER BY p.reviews_count DESC
              LIMIT 12`
           ),
-          turso.execute('SELECT id, name_ar, name_en, image_url FROM categories LIMIT 10'),
         ]);
 
         const mapProduct = (row: any) => {
@@ -61,9 +56,6 @@ export default function HomePage() {
 
         setNewArrivals(newResult.rows.filter((row: any) => row[6] === 1).slice(0, 6).map(mapProduct));
         setPopularProducts(popResult.rows.map(mapProduct));
-        setCategories(catsResult.rows.map((row: any) => ({
-          id: row[0], name_ar: row[1], name_en: row[2], image_url: row[3],
-        })));
       } catch (error) {
         console.error('Error fetching home data:', error);
       }
@@ -77,14 +69,6 @@ export default function HomePage() {
       <Hero />
       <Marquee />
 
-      {newArrivals.length > 0 && (
-        <ProductGrid
-          title={language === 'ar' ? 'وصل حديثاً' : 'Nouveautés'}
-          products={newArrivals}
-          linkHref="/products"
-        />
-      )}
-
       {popularProducts.length > 0 && (
         <ProductGrid
           title={language === 'ar' ? 'الأكثر شعبية' : 'Produits Populaires'}
@@ -93,9 +77,15 @@ export default function HomePage() {
         />
       )}
 
+      {newArrivals.length > 0 && (
+        <ProductGrid
+          title={language === 'ar' ? 'وصل حديثاً' : 'Nouveautés'}
+          products={newArrivals}
+          linkHref="/products"
+        />
+      )}
 
 
-      <CategoryShowcase />
 
       <section className="py-24 bg-bg-secondary border-y border-border-color transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

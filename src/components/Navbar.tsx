@@ -56,16 +56,16 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
 
-            {/* Hamburger - mobile only */}
+            {/* Hamburger - all screens */}
             <button
-              className="lg:hidden p-2 -ml-1 text-text-primary hover:text-neon-blue transition-colors flex-shrink-0"
+              className="p-2 -ml-1 text-text-primary hover:text-neon-blue transition-colors flex-shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
             >
               <Menu size={22} />
             </button>
 
             {/* Logo */}
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2 group lg:mr-8">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2 group">
               {config?.logo_url ? (
                 <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-8 sm:h-10 w-auto object-contain" />
               ) : (
@@ -74,23 +74,6 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-
-            {/* Desktop inline nav links */}
-            <div className="hidden lg:flex items-center gap-8 flex-1">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={`text-sm font-mono font-medium uppercase tracking-wider py-1 border-b-2 transition-all duration-200 ${
-                    isActive(link.href)
-                      ? 'text-neon-blue border-neon-blue'
-                      : 'text-text-secondary border-transparent hover:text-text-primary hover:border-text-secondary'
-                  }`}
-                >
-                  {language === 'ar' ? link.labelAr : link.labelFr}
-                </Link>
-              ))}
-            </div>
 
             {/* Right actions */}
             <div className="flex items-center gap-2 sm:gap-4">
@@ -175,14 +158,14 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
             />
             <motion.div
               initial={{ x: isRTL ? '100%' : '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: isRTL ? '100%' : '-100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className={`fixed top-0 bottom-0 w-full max-w-xs bg-bg-primary z-50 lg:hidden overflow-y-auto ${isRTL ? 'right-0 border-l' : 'left-0 border-r'} border-border-color`}
+              className={`fixed top-0 bottom-0 w-full max-w-xs bg-bg-primary z-50 overflow-y-auto ${isRTL ? 'right-0 border-l' : 'left-0 border-r'} border-border-color`}
             >
               <div className="p-6 h-full flex flex-col">
                 <div className="flex items-center justify-between mb-10">
