@@ -1,11 +1,11 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Star, ShoppingCart, Truck, ShieldCheck, ArrowLeft } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { Star, ShoppingCart, Truck, ShieldCheck, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { turso, parseImageUrl, isValidUrl, getOptimizedImageUrl } from '../lib/turso';
+import { turso, parseImageUrl, isValidUrl, getOptimizedImageUrl, extractIdPrefixFromSlug } from '../lib/turso';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useConfig } from '../context/ConfigContext';
 import RelatedProductsSlider from '../components/RelatedProductsSlider';
@@ -16,7 +16,7 @@ const getHighQualityUrl = (url: string | null | undefined, width = 900) => {
 };
 
 export default function ProductPage() {
-  const { id } = useParams();
+  const { id: slug } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -29,6 +29,9 @@ export default function ProductPage() {
   const { config } = useConfig();
   const navigate = useNavigate();
 
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
   const nextImage = useCallback(() => {
     if (product?.images?.length > 1) {
       setActiveImageIndex((prev) => (prev + 1) % product.images.length);
@@ -36,24 +39,55 @@ export default function ProductPage() {
     }
   }, [product?.images?.length]);
 
+  const prevImage = useCallback(() => {
+    if (product?.images?.length > 1) {
+      setActiveImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+      setCurrentDisplayImage(null);
+    }
+  }, [product?.images?.length]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) nextImage();
+      else prevImage();
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [id]);
+  }, [slug]);
 
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const productResult = await turso.execute({
-          sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
-                       p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
-                       p.description_en, p.description_ar, p.category_id,
-                       c.name_en AS category_name, p.images, c.name_ar AS category_name_ar
-                FROM products p
-                LEFT JOIN categories c ON p.category_id = c.id
-                WHERE p.id = ?`,
-          args: [id!],
-        });
+        const { idPrefix, isFullId } = extractIdPrefixFromSlug(slug!);
+        const sql = isFullId
+          ? `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
+                    p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
+                    p.description_en, p.description_ar, p.category_id,
+                    c.name_en AS category_name, p.images, c.name_ar AS category_name_ar
+             FROM products p LEFT JOIN categories c ON p.category_id = c.id
+             WHERE p.id = ?`
+          : `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
+                    p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
+                    p.description_en, p.description_ar, p.category_id,
+                    c.name_en AS category_name, p.images, c.name_ar AS category_name_ar
+             FROM products p LEFT JOIN categories c ON p.category_id = c.id
+             WHERE p.id LIKE ?`;
+        const args = isFullId ? [idPrefix] : [`${idPrefix}%`];
+
+        const productResult = await turso.execute({ sql, args });
 
         if (productResult.rows.length === 0) {
           setLoading(false);
@@ -65,9 +99,10 @@ export default function ProductPage() {
         const extraImages = parseImageUrl(row[15]);
         const rawImages = Array.from(new Set([...primaryImage, ...extraImages])).filter(Boolean);
 
+        const productId = row[0];
         const variantsResult = await turso.execute({
           sql: `SELECT id, name_en, name_ar, image_url, stock FROM product_variants WHERE product_id = ?`,
-          args: [id!],
+          args: [productId],
         });
 
         const variants = variantsResult.rows.map((vrow: any) => ({
@@ -82,7 +117,7 @@ export default function ProductPage() {
         const allImages = Array.from(new Set([...rawImages, ...variantImages]));
 
         setProduct({
-          id: row[0],
+          id: productId,
           name_en: row[1],
           name_ar: row[2],
           price: row[3],
@@ -113,16 +148,50 @@ export default function ProductPage() {
       }
     };
 
-    if (id) fetchProduct();
-  }, [id, language]);
+    if (slug) fetchProduct();
+  }, [slug, language]);
+
+  useEffect(() => {
+    if (!product) return;
+    const name = language === 'ar' ? (product.name_ar || product.name_en) : product.name_en;
+    const desc = language === 'ar' ? (product.description_ar || product.description_en) : (product.description_en || '');
+    const image = getHighQualityUrl(product.image_url || product.image, 800);
+
+    document.title = `${name} | Casa Gaming`;
+
+    const setMeta = (property: string, content: string, useProperty = true) => {
+      const attr = useProperty ? 'property' : 'name';
+      let el = document.querySelector(`meta[${attr}="${property}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, property);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+    };
+
+    setMeta('og:title', `${name} | Casa Gaming`);
+    setMeta('og:description', desc.slice(0, 200));
+    setMeta('og:image', image);
+    setMeta('og:type', 'product');
+    setMeta('og:url', window.location.href);
+    setMeta('twitter:card', 'summary_large_image', false);
+    setMeta('twitter:title', `${name} | Casa Gaming`, false);
+    setMeta('twitter:description', desc.slice(0, 200), false);
+    setMeta('twitter:image', image, false);
+
+    return () => {
+      document.title = 'Casa Gaming';
+    };
+  }, [product, language]);
 
   if (loading) {
-    return <div className="pt-32 pb-20"><LoadingSpinner /></div>;
+    return <div className="pt-36 pb-20"><LoadingSpinner /></div>;
   }
 
   if (!product) {
     return (
-      <div className="pt-32 pb-20 text-center">
+      <div className="pt-36 pb-20 text-center">
         <h2 className="text-2xl font-bold text-gray-900">{t('common.error')}</h2>
         <Link to="/products" className="text-neon-blue hover:underline mt-4 inline-block">
           {t('product.back')}
@@ -150,7 +219,7 @@ export default function ProductPage() {
   };
 
   return (
-    <div className={`pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'font-arabic' : ''}`}>
+    <div className={`pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'font-arabic' : ''}`}>
       <Link to="/products" className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary mb-8 transition-colors font-mono uppercase text-sm tracking-wider">
         <ArrowLeft size={16} className={isRTL ? 'rotate-180' : ''} /> {t('product.back')}
       </Link>
@@ -158,7 +227,11 @@ export default function ProductPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Product Images Section */}
         <div className="space-y-4">
-          <div className="bg-bg-secondary border border-border-color overflow-hidden aspect-square relative group">
+          <div
+            className="bg-bg-secondary border border-border-color overflow-hidden aspect-square relative group"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <AnimatePresence>
               <motion.img
                 key={currentDisplayImage || activeImageIndex}
@@ -182,39 +255,69 @@ export default function ProductPage() {
                 {t('product.out_of_stock')}
               </span>
             )}
+
+            {/* Arrow buttons on mobile when multiple images */}
+            {product.images.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="sm:hidden absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-black/60 text-white rounded-full z-10 active:scale-95"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="sm:hidden absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-black/60 text-white rounded-full z-10 active:scale-95"
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={20} />
+                </button>
+                <div className="sm:hidden absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                  {product.images.map((_: any, idx: number) => (
+                    <button
+                      key={idx}
+                      onClick={() => { setActiveImageIndex(idx); setCurrentDisplayImage(null); }}
+                      className={`h-1.5 rounded-full transition-all ${
+                        activeImageIndex === idx ? 'bg-neon-blue w-5' : 'bg-white/60 w-1.5'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Dots for mobile - Moved below image */}
+          {/* Thumbnails - mobile horizontal scroll + desktop grid */}
           {product.images.length > 1 && (
-            <div className="flex justify-center gap-2 sm:hidden py-4">
-              {product.images.map((_: any, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all border border-border-color ${
-                    activeImageIndex === idx ? 'bg-neon-blue w-6 border-neon-blue' : 'bg-bg-secondary'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-
-
-          {/* Thumbnails for desktop */}
-          {product.images.length > 1 && (
-            <div className="hidden sm:grid grid-cols-4 sm:grid-cols-6 gap-3">
-              {product.images.map((img: string, index: number) => (
-                <button
-                  key={index}
-                  onClick={() => { setActiveImageIndex(index); setCurrentDisplayImage(null); }}
-                  className={`aspect-square border-2 transition-all overflow-hidden bg-bg-secondary ${
-                    (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color hover:border-text-secondary'
-                  }`}
-                >
-                  <img src={getHighQualityUrl(img, 200)} alt={`${product.name} ${index + 1}`} loading="lazy" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="flex sm:hidden gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {product.images.map((img: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => { setActiveImageIndex(index); setCurrentDisplayImage(null); }}
+                    className={`flex-shrink-0 w-16 h-16 border-2 transition-all overflow-hidden bg-bg-secondary ${
+                      (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color'
+                    }`}
+                  >
+                    <img src={getHighQualityUrl(img, 200)} alt={`${product.name} ${index + 1}`} loading="lazy" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+              <div className="hidden sm:grid grid-cols-4 sm:grid-cols-6 gap-3">
+                {product.images.map((img: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => { setActiveImageIndex(index); setCurrentDisplayImage(null); }}
+                    className={`aspect-square border-2 transition-all overflow-hidden bg-bg-secondary ${
+                      (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color hover:border-text-secondary'
+                    }`}
+                  >
+                    <img src={getHighQualityUrl(img, 200)} alt={`${product.name} ${index + 1}`} loading="lazy" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
 

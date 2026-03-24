@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
+import { productSlug } from '../lib/turso';
 
 interface ProductCardProps {
   product: any; // Using any as the Product type might be out of date
@@ -41,7 +42,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
     >
-      <Link to={`/product/${product.id}`} className="block">
+      <Link to={`/product/${productSlug(product.name_en || product.name || '', product.id)}`} className="block">
         {/* Badges */}
         <div className={`absolute top-3 ${isRTL ? 'right-3' : 'left-3'} z-10 flex flex-col gap-2`}>
           {!!product.isNew && (

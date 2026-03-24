@@ -47,7 +47,7 @@ export default function CategoriesPage() {
   });
 
   return (
-    <div className={`pt-32 pb-20 px-4 bg-bg-primary min-h-screen ${isRTL ? 'text-right' : 'text-left'}`}>
+    <div className={`pt-36 pb-20 px-4 bg-bg-primary min-h-screen ${isRTL ? 'text-right' : 'text-left'}`}>
       <div className="max-w-[1600px] mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-5xl md:text-7xl font-bold text-text-primary mb-6 font-display uppercase tracking-tighter">

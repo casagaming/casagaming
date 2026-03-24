@@ -174,9 +174,9 @@ export default function ProductsPage() {
   if (sortOption !== 'default') activeFilters.push({ label: sortLabels[sortOption], onRemove: () => setSortOption('default') });
 
   return (
-    <div className={`pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
+    <div className={`pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
 
-      <div className={`flex items-center gap-4 mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex items-center gap-4 mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <Link to="/" className="p-2 bg-bg-secondary border border-border-color rounded-full text-text-secondary hover:text-neon-blue transition-colors">
           <ArrowLeft size={20} className={isRTL ? 'rotate-180' : ''} />
         </Link>
@@ -185,10 +185,11 @@ export default function ProductsPage() {
         </h1>
       </div>
 
-      <div className="flex flex-col gap-4 mb-6">
+      {/* Filter bar */}
+      <div className="flex flex-col gap-3 mb-6">
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap">
-
+        {/* Row 1: Search + Category + Price range */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative w-full sm:w-64">
             <input
               type="text"
@@ -201,7 +202,7 @@ export default function ProductsPage() {
           </div>
 
           <div className="relative group">
-            <button className="flex items-center gap-3 px-5 py-3 border border-border-color bg-bg-secondary text-text-primary hover:border-neon-blue transition-colors font-mono text-sm uppercase tracking-wider whitespace-nowrap">
+            <button className="flex items-center gap-3 px-5 py-3 border border-border-color bg-bg-secondary text-text-primary hover:border-neon-blue transition-colors font-mono text-sm uppercase tracking-wider whitespace-nowrap w-full sm:w-auto">
               <Filter size={15} />
               <span>{language === 'ar' ? 'الصنف' : 'Catégorie'}: {selectedCategory === 'All' ? (language === 'ar' ? 'الكل' : 'Tout') : selectedCategory}</span>
               <ChevronDown size={13} />
@@ -220,26 +221,7 @@ export default function ProductsPage() {
           </div>
 
           <div className="relative group">
-            <button className="flex items-center gap-3 px-5 py-3 border border-border-color bg-bg-secondary text-text-primary hover:border-neon-blue transition-colors font-mono text-sm uppercase tracking-wider whitespace-nowrap">
-              <ArrowUpDown size={15} />
-              <span>{sortOption === 'default' ? (language === 'ar' ? 'الترتيب' : 'Trier') : sortLabels[sortOption]}</span>
-              <ChevronDown size={13} />
-            </button>
-            <div className={`absolute top-full mt-1 w-64 bg-bg-secondary border border-border-color shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-30 ${isRTL ? 'right-0' : 'left-0'}`}>
-              {(['default', 'price_high_low', 'price_low_high'] as SortOption[]).map(opt => (
-                <button
-                  key={opt}
-                  onClick={() => setSortOption(opt)}
-                  className={`block w-full px-4 py-2.5 text-sm font-mono uppercase transition-colors border-b border-border-color last:border-0 ${isRTL ? 'text-right' : 'text-left'} ${sortOption === opt ? 'text-neon-blue bg-bg-primary' : 'text-text-secondary hover:bg-bg-primary hover:text-neon-blue'}`}
-                >
-                  {sortLabels[opt]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative group">
-            <button className="flex items-center gap-3 px-5 py-3 border border-border-color bg-bg-secondary text-text-primary hover:border-neon-blue transition-colors font-mono text-sm uppercase tracking-wider whitespace-nowrap">
+            <button className="flex items-center gap-3 px-5 py-3 border border-border-color bg-bg-secondary text-text-primary hover:border-neon-blue transition-colors font-mono text-sm uppercase tracking-wider whitespace-nowrap w-full sm:w-auto">
               <span>{t('filter.price_range')}</span>
               <ChevronDown size={13} />
             </button>
@@ -262,64 +244,98 @@ export default function ProductsPage() {
                   className="w-full px-3 py-2 bg-bg-primary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-sm"
                 />
               </div>
-              {(minPrice || maxPrice) && (
-                <button
-                  onClick={() => { setMinPrice(''); setMaxPrice(''); }}
-                  className="mt-3 text-xs text-neon-blue hover:text-white font-mono uppercase tracking-wider"
-                >
-                  {t('filter.clear_all')}
-                </button>
-              )}
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setNewOnly(v => !v)}
-              className={`flex items-center gap-2 px-4 py-3 border font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap ${newOnly ? 'border-neon-blue bg-neon-blue text-black font-bold' : 'border-border-color bg-bg-secondary text-text-secondary hover:border-neon-blue hover:text-neon-blue'}`}
-            >
-              <Sparkles size={13} />
-              {t('filter.new_only')}
-            </button>
-            <button
-              onClick={() => setSaleOnly(v => !v)}
-              className={`flex items-center gap-2 px-4 py-3 border font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap ${saleOnly ? 'border-neon-purple bg-neon-purple text-white font-bold' : 'border-border-color bg-bg-secondary text-text-secondary hover:border-neon-purple hover:text-neon-purple'}`}
-            >
-              <Tag size={13} />
-              {t('filter.sale_only')}
-            </button>
-            <button
-              onClick={() => setInStockOnly(v => !v)}
-              className={`flex items-center gap-2 px-4 py-3 border font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap ${inStockOnly ? 'border-green-500 bg-green-500 text-black font-bold' : 'border-border-color bg-bg-secondary text-text-secondary hover:border-green-500 hover:text-green-500'}`}
-            >
-              <PackageCheck size={13} />
-              {t('filter.in_stock')}
-            </button>
           </div>
         </div>
 
-        {activeFilters.length > 0 && (
-          <div className={`flex items-center gap-2 flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <span className="text-xs text-text-secondary font-mono uppercase tracking-wider">{t('filter.active')}:</span>
-            {activeFilters.map((f, i) => (
-              <span
-                key={i}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-bg-secondary border border-neon-blue text-neon-blue text-xs font-mono uppercase"
-              >
-                {f.label}
-                <button onClick={f.onRemove} className="hover:text-white transition-colors ml-1">
-                  <X size={11} />
-                </button>
-              </span>
-            ))}
+        {/* Row 2: Quick filters - always visible as horizontal scroll */}
+        <div className="overflow-x-auto scrollbar-hide -mx-1">
+          <div className={`flex items-center gap-2 px-1 pb-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {/* Nouveau */}
             <button
-              onClick={clearAllFilters}
-              className="text-xs text-text-secondary hover:text-white font-mono uppercase tracking-wider underline underline-offset-2"
+              onClick={() => setNewOnly(v => !v)}
+              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 border font-mono text-xs font-bold uppercase tracking-widest transition-all rounded-sm ${
+                newOnly
+                  ? 'border-neon-blue bg-neon-blue text-black'
+                  : 'border-border-color bg-bg-secondary text-text-secondary hover:border-neon-blue hover:text-neon-blue'
+              }`}
             >
-              {t('filter.clear_all')}
+              <Sparkles size={13} />
+              {language === 'ar' ? 'جديد' : 'Nouveau'}
             </button>
+
+            {/* Solde */}
+            <button
+              onClick={() => setSaleOnly(v => !v)}
+              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 border font-mono text-xs font-bold uppercase tracking-widest transition-all rounded-sm ${
+                saleOnly
+                  ? 'border-neon-purple bg-neon-purple text-white'
+                  : 'border-border-color bg-bg-secondary text-text-secondary hover:border-neon-purple hover:text-neon-purple'
+              }`}
+            >
+              <Tag size={13} />
+              {language === 'ar' ? 'تخفيضات' : 'Solde'}
+            </button>
+
+            {/* Divider */}
+            <div className="flex-shrink-0 w-px h-7 bg-border-color mx-1" />
+
+            {/* Prix bas → haut */}
+            <button
+              onClick={() => setSortOption(sortOption === 'price_low_high' ? 'default' : 'price_low_high')}
+              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 border font-mono text-xs font-bold uppercase tracking-widest transition-all rounded-sm ${
+                sortOption === 'price_low_high'
+                  ? 'border-neon-blue bg-neon-blue text-black'
+                  : 'border-border-color bg-bg-secondary text-text-secondary hover:border-neon-blue hover:text-neon-blue'
+              }`}
+            >
+              <ArrowUpDown size={13} />
+              {language === 'ar' ? 'سعر ↑' : 'Prix ↑'}
+            </button>
+
+            {/* Prix haut → bas */}
+            <button
+              onClick={() => setSortOption(sortOption === 'price_high_low' ? 'default' : 'price_high_low')}
+              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 border font-mono text-xs font-bold uppercase tracking-widest transition-all rounded-sm ${
+                sortOption === 'price_high_low'
+                  ? 'border-neon-blue bg-neon-blue text-black'
+                  : 'border-border-color bg-bg-secondary text-text-secondary hover:border-neon-blue hover:text-neon-blue'
+              }`}
+            >
+              <ArrowUpDown size={13} />
+              {language === 'ar' ? 'سعر ↓' : 'Prix ↓'}
+            </button>
+
+            <div className="flex-shrink-0 w-px h-7 bg-border-color mx-1" />
+
+            {/* En stock */}
+            <button
+              onClick={() => setInStockOnly(v => !v)}
+              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 border font-mono text-xs font-bold uppercase tracking-widest transition-all rounded-sm ${
+                inStockOnly
+                  ? 'border-green-500 bg-green-500 text-black'
+                  : 'border-border-color bg-bg-secondary text-text-secondary hover:border-green-500 hover:text-green-500'
+              }`}
+            >
+              <PackageCheck size={13} />
+              {language === 'ar' ? 'متوفر' : 'En stock'}
+            </button>
+
+            {/* Clear all */}
+            {activeFilters.length > 0 && (
+              <>
+                <div className="flex-shrink-0 w-px h-7 bg-border-color mx-1" />
+                <button
+                  onClick={clearAllFilters}
+                  className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 text-xs font-mono uppercase text-text-secondary hover:text-white transition-colors"
+                >
+                  <X size={12} />
+                  {language === 'ar' ? 'مسح' : 'Effacer'}
+                </button>
+              </>
+            )}
           </div>
-        )}
+        </div>
 
         {!loading && (
           <p className="text-xs text-text-secondary font-mono uppercase tracking-wider">

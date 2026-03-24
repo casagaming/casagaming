@@ -133,7 +133,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0 && !isSubmitting) {
     return (
-      <div className="pt-32 pb-20 text-center min-h-[60vh] flex flex-col justify-center items-center">
+      <div className="pt-36 pb-20 text-center min-h-[60vh] flex flex-col justify-center items-center">
         <h2 className="text-4xl font-bold text-text-primary font-display uppercase tracking-tighter mb-6">{t('cart.empty')}</h2>
         <Link to="/products" className="text-neon-blue hover:text-text-primary font-mono uppercase tracking-widest border-b border-neon-blue hover:border-text-primary transition-all pb-1">
           {language === 'ar' ? 'ابدأ التسوق' : 'Commencer les achats'}
@@ -143,10 +143,10 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className={`pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
+    <div className={`pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <form onSubmit={handleConfirmOrder}>
-          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-12 font-display uppercase tracking-tighter">{t('checkout.title')}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-text-primary mb-10 font-display uppercase tracking-tighter">{t('checkout.title')}</h1>
 
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500 text-red-500 font-mono text-sm uppercase">
@@ -154,68 +154,45 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          <div className="mb-12">
-            <h2 className={`text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2 ${isRTL ? 'text-right' : ''}`}>{t('checkout.contact_info')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input
-                type="text"
-                placeholder={t('checkout.first_name')}
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value.slice(0, 20))}
-                className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase"
-                required
-              />
-              <input
-                type="text"
-                placeholder={t('checkout.last_name')}
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value.slice(0, 20))}
-                className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase"
-                required
-              />
-              <input
-                type="tel"
-                placeholder={`${t('checkout.phone')} (e.g. 05XXXXXXXX)`}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue md:col-span-2 font-mono text-base uppercase"
-                required
-              />
+          {/* STEP 1 — Wilaya */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-8 h-8 rounded-full bg-neon-blue text-black flex items-center justify-center font-mono font-black text-sm flex-shrink-0">1</div>
+              <div>
+                <h2 className="text-lg font-black text-text-primary font-display uppercase tracking-wider leading-none">
+                  Wilaya <span className="text-text-secondary font-normal normal-case text-base">(الولاية)</span>
+                </h2>
+                <p className="text-xs text-text-secondary font-mono mt-0.5">Choisissez votre wilaya · اختر ولايتك</p>
+              </div>
             </div>
-          </div>
-
-          <div className="mb-12">
-            <h2 className="text-xl font-bold text-text-primary mb-6 font-display uppercase tracking-wider border-b border-border-color pb-2">{t('checkout.shipping_details')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="md:col-span-2 relative text-left" dir="ltr">
-                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.wilaya')} (State)</label>
+            <div className="pl-12">
+              <div className="relative text-left" dir="ltr">
                 <div
-                  className="w-full p-4 bg-white border border-border-color text-black flex items-center justify-between cursor-pointer font-mono text-base uppercase"
+                  className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary flex items-center justify-between cursor-pointer font-mono text-base uppercase hover:border-neon-blue transition-colors"
                   onClick={() => setIsWilayaDropdownOpen(!isWilayaDropdownOpen)}
                 >
-                  <span>
-                    {selectedWilaya} - {wilayas.find(w => w.wilaya_id === selectedWilaya)?.wilaya_name_en || (language === 'ar' ? 'اختر الولاية' : 'Sélectionner la Wilaya')}
+                  <span className="font-bold">
+                    {selectedWilaya} — {wilayas.find(w => w.wilaya_id === selectedWilaya)?.wilaya_name_en || 'Sélectionner la Wilaya'}
                   </span>
-                  <ChevronDown size={16} className={`transition-transform ${isWilayaDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={18} className={`transition-transform text-neon-blue ${isWilayaDropdownOpen ? 'rotate-180' : ''}`} />
                 </div>
 
                 {isWilayaDropdownOpen && (
-                  <div className="absolute z-[100] left-0 right-0 mt-1 bg-white border border-border-color shadow-2xl max-h-72 overflow-y-auto custom-scrollbar">
-                    <div className="sticky top-0 bg-white p-2 border-b border-gray-100">
+                  <div className="absolute z-[100] left-0 right-0 mt-1 bg-bg-secondary border-2 border-neon-blue shadow-2xl max-h-72 overflow-y-auto">
+                    <div className="sticky top-0 bg-bg-secondary p-2 border-b border-border-color">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={14} />
                         <input
                           type="text"
-                          placeholder="Search state..."
+                          placeholder="Rechercher / ابحث عن ولايتك..."
                           value={wilayaSearch}
                           onChange={(e) => setWilayaSearch(e.target.value)}
                           onClick={(e) => e.stopPropagation()}
-                          className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 text-black text-base font-mono uppercase focus:outline-none focus:border-neon-blue"
+                          className="w-full pl-9 pr-4 py-2 bg-bg-primary border border-border-color text-text-primary text-sm font-mono focus:outline-none focus:border-neon-blue placeholder:text-text-secondary"
                           autoFocus
                         />
                       </div>
                     </div>
-
                     {wilayas
                       .filter(w =>
                         w.wilaya_name_en.toLowerCase().includes(wilayaSearch.toLowerCase()) ||
@@ -224,81 +201,178 @@ export default function CheckoutPage() {
                       .map(w => (
                         <div
                           key={w.wilaya_id}
-                          className={`p-3 cursor-pointer hover:bg-neon-blue hover:text-white transition-colors text-black text-base font-mono border-b border-gray-50 ${selectedWilaya === w.wilaya_id ? 'bg-gray-100 font-bold' : ''}`}
+                          className={`px-4 py-3 cursor-pointer hover:bg-neon-blue hover:text-black transition-colors text-text-primary text-sm font-mono border-b border-border-color last:border-0 ${selectedWilaya === w.wilaya_id ? 'bg-neon-blue/10 text-neon-blue font-bold' : ''}`}
                           onClick={() => {
                             setSelectedWilaya(w.wilaya_id);
                             setIsWilayaDropdownOpen(false);
                             setWilayaSearch('');
                           }}
                         >
-                          {w.wilaya_id} - {w.wilaya_name_en}
+                          <span className="text-text-secondary mr-2">{w.wilaya_id} —</span>{w.wilaya_name_en}
                         </div>
                       ))}
                   </div>
                 )}
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.commune')} (Municipality)</label>
+            </div>
+          </div>
+
+          {/* STEP 2 — Delivery Method */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-8 h-8 rounded-full bg-neon-blue text-black flex items-center justify-center font-mono font-black text-sm flex-shrink-0">2</div>
+              <div>
+                <h2 className="text-lg font-black text-text-primary font-display uppercase tracking-wider leading-none">
+                  Mode de Livraison <span className="text-text-secondary font-normal normal-case text-base">(طريقة التوصيل)</span>
+                </h2>
+                <p className="text-xs text-text-secondary font-mono mt-0.5">Choisissez comment recevoir votre commande · اختر طريقة الاستلام</p>
+              </div>
+            </div>
+            <div className="pl-12 space-y-3">
+              <div
+                className={`border-2 p-5 flex items-center justify-between cursor-pointer transition-all ${shippingMethod === 'home' ? 'border-neon-blue bg-neon-blue/5' : 'border-border-color hover:border-neon-blue/40 bg-bg-secondary'}`}
+                onClick={() => setShippingMethod('home')}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${shippingMethod === 'home' ? 'border-neon-blue' : 'border-text-secondary'}`}>
+                    {shippingMethod === 'home' && <div className="w-2.5 h-2.5 rounded-full bg-neon-blue"></div>}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MapPin size={20} className={shippingMethod === 'home' ? 'text-neon-blue' : 'text-text-secondary'} />
+                    <div>
+                      <span className={`font-bold uppercase tracking-wider text-sm block ${shippingMethod === 'home' ? 'text-text-primary' : 'text-text-secondary'}`}>
+                        {t('checkout.home_delivery')}
+                      </span>
+                      <span className="text-xs text-text-secondary font-mono">توصيل للمنزل</span>
+                    </div>
+                  </div>
+                </div>
+                <span className={`font-black font-mono text-lg ${shippingMethod === 'home' ? 'text-neon-blue' : 'text-text-primary'}`}>
+                  {wilayas.find(w => w.wilaya_id === selectedWilaya)?.home_delivery_price ?? '—'} <span className="text-xs">{t('product.currency')}</span>
+                </span>
+              </div>
+
+              <div
+                className={`border-2 p-5 flex items-center justify-between cursor-pointer transition-all ${shippingMethod === 'desk' ? 'border-neon-blue bg-neon-blue/5' : 'border-border-color hover:border-neon-blue/40 bg-bg-secondary'}`}
+                onClick={() => setShippingMethod('desk')}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${shippingMethod === 'desk' ? 'border-neon-blue' : 'border-text-secondary'}`}>
+                    {shippingMethod === 'desk' && <div className="w-2.5 h-2.5 rounded-full bg-neon-blue"></div>}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Truck size={20} className={shippingMethod === 'desk' ? 'text-neon-blue' : 'text-text-secondary'} />
+                    <div>
+                      <span className={`font-bold uppercase tracking-wider text-sm block ${shippingMethod === 'desk' ? 'text-text-primary' : 'text-text-secondary'}`}>
+                        {t('checkout.stop_desk')}
+                      </span>
+                      <span className="text-xs text-text-secondary font-mono">توصيل للمكتب (Stop Desk)</span>
+                    </div>
+                  </div>
+                </div>
+                <span className={`font-black font-mono text-lg ${shippingMethod === 'desk' ? 'text-neon-blue' : 'text-text-primary'}`}>
+                  {wilayas.find(w => w.wilaya_id === selectedWilaya)?.desk_delivery_price ?? '—'} <span className="text-xs">{t('product.currency')}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* STEP 3 — Personal Info */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-8 h-8 rounded-full bg-neon-blue text-black flex items-center justify-center font-mono font-black text-sm flex-shrink-0">3</div>
+              <div>
+                <h2 className="text-lg font-black text-text-primary font-display uppercase tracking-wider leading-none">
+                  Vos Informations <span className="text-text-secondary font-normal normal-case text-base">(معلوماتك)</span>
+                </h2>
+                <p className="text-xs text-text-secondary font-mono mt-0.5">Nom, prénom et numéro · الاسم، اللقب، الهاتف</p>
+              </div>
+            </div>
+            <div className="pl-12 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">
+                  Prénom <span className="text-text-secondary/60 normal-case">(الاسم)</span>
+                </label>
                 <input
                   type="text"
-                  placeholder={language === 'ar' ? 'أدخل بلديتك' : 'ENTRER VOTRE COMMUNE'}
-                  value={municipality}
-                  onChange={(e) => setMunicipality(e.target.value)}
-                  className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase"
+                  placeholder="Ahmed"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value.slice(0, 20))}
+                  className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase transition-colors"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">
+                  Nom <span className="text-text-secondary/60 normal-case">(اللقب)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Benali"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value.slice(0, 20))}
+                  className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase transition-colors"
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">
+                  Numéro de Téléphone <span className="text-text-secondary/60 normal-case">(رقم الهاتف)</span>
+                </label>
+                <input
+                  type="tel"
+                  placeholder="05XXXXXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase transition-colors"
                   required
                 />
               </div>
             </div>
+          </div>
 
-            <div className="space-y-4 mb-8">
-              <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.delivery_method')}</label>
-
-              <div
-                className={`border p-6 flex items-center justify-between cursor-pointer transition-all group ${shippingMethod === 'home' ? 'border-neon-blue bg-neon-blue/5' : 'border-border-color hover:border-text-primary/30 bg-bg-secondary'}`}
-                onClick={() => setShippingMethod('home')}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-5 h-5 border flex items-center justify-center ${shippingMethod === 'home' ? 'border-neon-blue' : 'border-text-secondary'}`}>
-                    {shippingMethod === 'home' && <div className="w-3 h-3 bg-neon-blue"></div>}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MapPin size={20} className={shippingMethod === 'home' ? 'text-neon-blue' : 'text-text-secondary'} />
-                    <span className={`font-bold uppercase tracking-wider ${shippingMethod === 'home' ? 'text-text-primary' : 'text-text-secondary'}`}>{t('checkout.home_delivery')}</span>
-                  </div>
-                </div>
-                <span className="font-bold text-text-primary font-mono">{wilayas.find(w => w.wilaya_id === selectedWilaya)?.home_delivery_price} {t('product.currency')}</span>
-              </div>
-
-              <div
-                className={`border p-6 flex items-center justify-between cursor-pointer transition-all group ${shippingMethod === 'desk' ? 'border-neon-blue bg-neon-blue/5' : 'border-border-color hover:border-text-primary/30 bg-bg-secondary'}`}
-                onClick={() => setShippingMethod('desk')}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`w-5 h-5 border flex items-center justify-center ${shippingMethod === 'desk' ? 'border-neon-blue' : 'border-text-secondary'}`}>
-                    {shippingMethod === 'desk' && <div className="w-3 h-3 bg-neon-blue"></div>}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Truck size={20} className={shippingMethod === 'desk' ? 'text-neon-blue' : 'text-text-secondary'} />
-                    <span className={`font-bold uppercase tracking-wider ${shippingMethod === 'desk' ? 'text-text-primary' : 'text-text-secondary'}`}>{t('checkout.stop_desk')}</span>
-                  </div>
-                </div>
-                <span className="font-bold text-text-primary font-mono">{wilayas.find(w => w.wilaya_id === selectedWilaya)?.desk_delivery_price} {t('product.currency')}</span>
+          {/* STEP 4 — Address */}
+          <div className="mb-10">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-8 h-8 rounded-full bg-neon-blue text-black flex items-center justify-center font-mono font-black text-sm flex-shrink-0">4</div>
+              <div>
+                <h2 className="text-lg font-black text-text-primary font-display uppercase tracking-wider leading-none">
+                  Adresse <span className="text-text-secondary font-normal normal-case text-base">(العنوان)</span>
+                </h2>
+                <p className="text-xs text-text-secondary font-mono mt-0.5">Commune et adresse complète · البلدية والعنوان</p>
               </div>
             </div>
-
-            {shippingMethod === 'home' && (
-              <div className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
-                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">{t('checkout.address')}</label>
-                <textarea
-                  placeholder={language === 'ar' ? 'أدخل عنوانك الكامل بالتفصيل' : 'ENTRER VOTRE ADRESSE COMPLÈTE'}
-                  rows={3}
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full p-4 bg-bg-secondary border border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase resize-none"
-                  required={shippingMethod === 'home'}
-                ></textarea>
+            <div className="pl-12 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">
+                  Commune <span className="text-text-secondary/60 normal-case">(البلدية)</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder={language === 'ar' ? 'مثال: سيدي موسى' : 'Ex: Sidi Moussa'}
+                  value={municipality}
+                  onChange={(e) => setMunicipality(e.target.value)}
+                  className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase transition-colors"
+                  required
+                />
               </div>
-            )}
+
+              {shippingMethod === 'home' && (
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary mb-2 uppercase tracking-wider font-mono">
+                    Adresse Complète <span className="text-text-secondary/60 normal-case">(العنوان الكامل)</span>
+                  </label>
+                  <textarea
+                    placeholder={language === 'ar' ? 'مثال: شارع العربي بن مهيدي، رقم 12، الطابق 3' : 'Ex: Rue Larbi Ben Mhidi, N°12, 3ème étage'}
+                    rows={3}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase resize-none transition-colors"
+                    required={shippingMethod === 'home'}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           <button

@@ -1,59 +1,38 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { Search, ShoppingCart, Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useConfig } from '../context/ConfigContext';
 import { useLanguage } from '../context/LanguageContext';
-import { turso } from '../lib/turso';
 
-interface Category {
-  id: string;
-  name_en: string;
-  name_ar: string;
-}
+const NAV_LINKS = [
+  { labelFr: 'Accueil', labelAr: 'الرئيسية', href: '/' },
+  { labelFr: 'Tous les produits', labelAr: 'كل المنتجات', href: '/products' },
+  { labelFr: 'Clavier', labelAr: 'كلافيي', href: '/products?category=KEYBORDS' },
+  { labelFr: 'Accessoire clavier', labelAr: 'اكسسوار كلافيي', href: '/products?category=KEYCAPS' },
+];
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [categories, setCategories] = useState<Category[]>([]);
   const { cartCount } = useCart();
   const { theme, toggleTheme } = useTheme();
   const { config } = useConfig();
   const { language, setLanguage, t, isRTL } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const result = await turso.execute(
-          'SELECT id, name_en, name_ar FROM categories ORDER BY name_en ASC'
-        );
-        const cats = result.rows.map((row: any) => ({
-          id: row[0] as string,
-          name_en: row[1] as string,
-          name_ar: row[2] as string,
-        }));
-        setCategories(cats);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  const navLinks = [
-    { name: t('nav.home'), href: '/' },
-    { name: t('nav.products'), href: '/products' },
-    { name: t('nav.categories'), href: '/categories' },
-    ...categories.slice(0, 5).map(cat => ({
-      name: language === 'ar' ? cat.name_ar : cat.name_en,
-      href: `/products?category=${encodeURIComponent(cat.name_en)}`,
-    })),
-  ];
+  const isActive = (href: string) => {
+    if (href === '/') return location.pathname === '/';
+    const [path, query] = href.split('?');
+    if (query) {
+      return location.pathname === path && location.search.includes(query.split('=')[1]);
+    }
+    return location.pathname.startsWith(path) && !location.search;
+  };
 
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -64,11 +43,18 @@ export default function Navbar() {
     }
   };
 
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
+
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-bg-primary/90 backdrop-blur-md border-b border-border-color py-4 transition-colors duration-300">
+      {/* Main top bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-bg-primary/95 backdrop-blur-md border-b border-border-color transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between h-16">
+
+            {/* Hamburger - mobile only */}
             <button
               className="lg:hidden p-2 text-text-primary hover:text-neon-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(true)}
@@ -76,39 +62,43 @@ export default function Navbar() {
               <Menu size={24} />
             </button>
 
+            {/* Logo */}
             <Link to="/" className="flex-shrink-0 flex items-center gap-2 group">
               {config?.logo_url ? (
                 <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-10 w-auto object-contain" />
               ) : (
-                <div className="flex flex-col">
-                  <span className="font-display font-bold text-2xl tracking-tighter leading-none text-text-primary group-hover:text-neon-blue transition-colors duration-300">
-                    CASA<span className="text-neon-blue">GAMING</span>
-                  </span>
-                </div>
+                <span className="font-display font-bold text-2xl tracking-tighter leading-none text-text-primary group-hover:text-neon-blue transition-colors duration-300">
+                  CASA<span className="text-neon-blue">GAMING</span>
+                </span>
               )}
             </Link>
 
-            <div className="hidden lg:flex items-center space-x-8">
-              {navLinks.map((link) => (
-                <div key={link.name} className="relative group">
-                  <Link
-                    to={link.href}
-                    className="flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors py-2 uppercase tracking-wider font-mono"
-                  >
-                    {link.name}
-                    {(link as any).hasDropdown && <ChevronDown size={12} className="group-hover:rotate-180 transition-transform duration-200" />}
-                  </Link>
-                </div>
+            {/* Desktop inline nav links */}
+            <div className="hidden lg:flex items-center gap-8">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className={`text-sm font-mono font-medium uppercase tracking-wider py-1 border-b-2 transition-all duration-200 ${
+                    isActive(link.href)
+                      ? 'text-neon-blue border-neon-blue'
+                      : 'text-text-secondary border-transparent hover:text-text-primary hover:border-text-secondary'
+                  }`}
+                >
+                  {language === 'ar' ? link.labelAr : link.labelFr}
+                </Link>
               ))}
             </div>
 
-            <div className="flex items-center space-x-6">
-              <div className="hidden lg:flex relative items-center">
+            {/* Right actions */}
+            <div className="flex items-center gap-4">
+              {/* Search */}
+              <div className="relative flex items-center">
                 <AnimatePresence>
                   {isSearchOpen && (
                     <motion.form
                       initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: 200, opacity: 1 }}
+                      animate={{ width: 180, opacity: 1 }}
                       exit={{ width: 0, opacity: 0 }}
                       onSubmit={handleSearchSubmit}
                       className="absolute right-8 top-1/2 -translate-y-1/2 overflow-hidden"
@@ -132,14 +122,15 @@ export default function Navbar() {
                 </button>
               </div>
 
+              {/* Theme */}
               <button
                 onClick={toggleTheme}
                 className="text-text-secondary hover:text-text-primary transition-colors"
-                title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
 
+              {/* Language */}
               <button
                 onClick={() => setLanguage(language === 'fr' ? 'ar' : 'fr')}
                 className="text-text-secondary hover:text-text-primary transition-colors font-mono font-bold text-sm border border-border-color px-2 py-0.5 rounded hover:border-neon-blue"
@@ -147,15 +138,38 @@ export default function Navbar() {
                 {language === 'fr' ? 'AR' : 'FR'}
               </button>
 
-              <Link to="/cart" className="hidden lg:flex relative text-text-secondary hover:text-text-primary transition-colors group items-center gap-2">
+              {/* Cart */}
+              <Link to="/cart" className="relative text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1.5">
                 <ShoppingCart size={20} />
-                <span className="font-mono text-xs font-bold">[{cartCount}]</span>
+                {cartCount > 0 && (
+                  <span className="font-mono text-xs font-bold text-neon-blue">[{cartCount}]</span>
+                )}
               </Link>
             </div>
           </div>
         </div>
+
+        {/* Secondary sticky inline nav - always visible on all screens */}
+        <div className="border-t border-border-color bg-bg-primary/95 overflow-x-auto scrollbar-hide">
+          <div className={`flex items-center gap-0 max-w-7xl mx-auto ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`flex-shrink-0 px-5 py-2.5 text-xs font-mono font-bold uppercase tracking-widest border-b-2 transition-all duration-200 whitespace-nowrap ${
+                  isActive(link.href)
+                    ? 'text-neon-blue border-neon-blue bg-neon-blue/5'
+                    : 'text-text-secondary border-transparent hover:text-text-primary hover:border-border-color'
+                }`}
+              >
+                {language === 'ar' ? link.labelAr : link.labelFr}
+              </Link>
+            ))}
+          </div>
+        </div>
       </nav>
 
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
@@ -167,7 +181,7 @@ export default function Navbar() {
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden"
             />
             <motion.div
-               initial={{ x: isRTL ? '100%' : '-100%' }}
+              initial={{ x: isRTL ? '100%' : '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: isRTL ? '100%' : '-100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
@@ -181,22 +195,28 @@ export default function Navbar() {
                   </button>
                 </div>
                 <div className="flex flex-col space-y-8 flex-1">
-                  {navLinks.map((link) => (
+                  {NAV_LINKS.map((link) => (
                     <Link
-                      key={link.name}
+                      key={link.href}
                       to={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-2xl font-display font-bold text-text-primary hover:text-neon-blue transition-colors uppercase tracking-wider"
+                      className={`text-2xl font-display font-bold uppercase tracking-wider transition-colors ${
+                        isActive(link.href) ? 'text-neon-blue' : 'text-text-primary hover:text-neon-blue'
+                      }`}
                     >
-                      {link.name}
+                      {language === 'ar' ? link.labelAr : link.labelFr}
                     </Link>
                   ))}
                 </div>
-                 <div className="mt-auto pt-8 border-t border-border-color">
-                  <div className={`flex flex-col gap-4 font-mono text-sm text-text-secondary ${isRTL ? 'items-end' : 'items-start'}`}>
-                    <a href="#" className="hover:text-text-primary">{language === 'ar' ? 'الحساب' : 'COMPTE'}</a>
-                    <a href="#" className="hover:text-text-primary">{language === 'ar' ? 'قائمة الأمنيات' : 'LISTE DE SOUHAITS'}</a>
-                  </div>
+                <div className="mt-auto pt-8 border-t border-border-color">
+                  <Link
+                    to="/cart"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 text-text-secondary hover:text-text-primary font-mono text-sm uppercase tracking-wider"
+                  >
+                    <ShoppingCart size={18} />
+                    {language === 'ar' ? 'السلة' : 'Panier'} {cartCount > 0 && `[${cartCount}]`}
+                  </Link>
                 </div>
               </div>
             </motion.div>

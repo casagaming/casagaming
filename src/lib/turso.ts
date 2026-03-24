@@ -92,24 +92,40 @@ export const turso = { execute };
 
 export const isValidUrl = (url: any) => typeof url === 'string' && (url.startsWith('http') || url.startsWith('/'));
 
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function productSlug(nameEn: string, id: string): string {
+  const slug = slugify(nameEn);
+  const shortId = id.slice(0, 8);
+  return `${slug}-${shortId}`;
+}
+
+export function extractIdPrefixFromSlug(slug: string): { idPrefix: string; isFullId: boolean } {
+  if (/^[a-f0-9]{32}$/i.test(slug)) {
+    return { idPrefix: slug, isFullId: true };
+  }
+  const parts = slug.split('-');
+  const idPrefix = parts[parts.length - 1];
+  return { idPrefix, isFullId: false };
+}
+
 export function getOptimizedImageUrl(url: string | null | undefined, width?: number): string {
   if (!url) return '';
   if (url.includes('cloudinary.com') && url.includes('/upload/')) {
     const alreadyHasTransforms = /\/upload\/(?!v\d)[a-z_,0-9:]+\//.test(url);
     if (alreadyHasTransforms) return url;
 
-    let quality: string;
-    if (!width) {
-      quality = 'q_auto';
-    } else if (width >= 800) {
-      quality = 'q_auto:best';
-    } else {
-      quality = 'q_auto:eco';
-    }
-
     const transforms = width
-      ? `f_auto,${quality},w_${width},c_fill`
-      : `f_auto,${quality}`;
+      ? `f_auto,q_auto:best,w_${width},c_limit`
+      : `f_auto,q_auto:best`;
 
     return url.replace('/upload/', `/upload/${transforms}/`);
   }

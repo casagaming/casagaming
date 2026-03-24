@@ -43,7 +43,7 @@ export default function CatalogPage() {
   };
 
   return (
-    <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300">
+    <div className="pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
         <div>
           <h1 className="text-4xl font-bold text-text-primary mb-2 font-display uppercase tracking-tighter">All Products</h1>
