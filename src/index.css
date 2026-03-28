@@ -48,6 +48,25 @@
   }
 }
 
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee-scroll 30s linear infinite;
+  will-change: transform;
+}
+
+@keyframes spin-loader {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-loader {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-neon-purple;

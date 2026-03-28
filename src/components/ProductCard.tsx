@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { Star, AlertCircle } from 'lucide-react';
 import { Product } from '../data';
 import { Link } from 'react-router-dom';
@@ -9,7 +8,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { productSlug } from '../lib/turso';
 
 interface ProductCardProps {
-  product: any; // Using any as the Product type might be out of date
+  product: any;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
@@ -25,7 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleAddToCart = (e: React.MouseEvent) => {
     if (product.variants_count > 0) {
-      return; // Link wrapper handles navigation
+      return;
     }
     e.preventDefault();
     if (!isOutOfStock) {
@@ -35,12 +34,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <motion.div 
+    <div
       className={`group relative bg-card-bg border border-border-color hover:border-neon-blue transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
     >
       <Link to={`/product/${productSlug(product.name_en || product.name || '', product.id)}`} className="block">
         {/* Badges */}
@@ -69,16 +64,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             alt={productName}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover transition-opacity duration-500 opacity-90 group-hover:opacity-100"
+            className="w-full h-full object-cover transition-opacity duration-300 opacity-90 group-hover:opacity-100"
           />
           {product.hoverImage && (
-             <img
-               src={product.hoverImage}
-               alt={productName}
-               loading="lazy"
-               decoding="async"
-               className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-             />
+            <img
+              src={product.hoverImage}
+              alt={productName}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            />
           )}
         </div>
 
@@ -109,10 +104,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             
             <div 
               onClick={product.variants_count > 0 ? undefined : handleAddToCart}
-              className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-all duration-300 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} font-mono flex items-center justify-center gap-2
+              className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-colors duration-200 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} font-mono flex items-center justify-center gap-2
                 ${product.variants_count > 0 
                   ? 'bg-transparent border border-neon-blue text-neon-blue hover:bg-neon-blue hover:text-black' 
-                  : 'bg-neon-blue text-black hover:bg-neon-blue/80 shadow-[0_0_10px_rgba(0,243,255,0.2)] hover:shadow-[0_0_20px_rgba(0,243,255,0.4)]'
+                  : 'bg-neon-blue text-black hover:bg-neon-blue/80'
                 }`}
             >
               {isOutOfStock 
@@ -122,7 +117,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 };
 
