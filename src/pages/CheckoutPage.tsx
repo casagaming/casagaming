@@ -295,7 +295,7 @@ export default function CheckoutPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Ahmed"
+                  placeholder={language === 'ar' ? 'الاسم' : 'Prénom'}
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value.slice(0, 20))}
                   className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase transition-colors"
@@ -308,7 +308,7 @@ export default function CheckoutPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder="Benali"
+                  placeholder={language === 'ar' ? 'اللقب' : 'Nom'}
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value.slice(0, 20))}
                   className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase transition-colors"
@@ -349,7 +349,7 @@ export default function CheckoutPage() {
                 </label>
                 <input
                   type="text"
-                  placeholder={language === 'ar' ? 'مثال: سيدي موسى' : 'Ex: Sidi Moussa'}
+                  placeholder={language === 'ar' ? 'أدخل اسم البلدية' : 'Entrez votre commune'}
                   value={municipality}
                   onChange={(e) => setMunicipality(e.target.value)}
                   className="w-full p-4 bg-bg-secondary border-2 border-border-color text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-neon-blue font-mono text-base uppercase transition-colors"
@@ -363,7 +363,7 @@ export default function CheckoutPage() {
                     Adresse Complète <span className="text-text-secondary/60 normal-case">(العنوان الكامل)</span>
                   </label>
                   <textarea
-                    placeholder={language === 'ar' ? 'مثال: شارع العربي بن مهيدي، رقم 12، الطابق 3' : 'Ex: Rue Larbi Ben Mhidi, N°12, 3ème étage'}
+                    placeholder={language === 'ar' ? 'أدخل عنوانك الكامل (الشارع، رقم المنزل، الطابق...)' : 'Entrez votre adresse complète (rue, N°, étage...)'}
                     rows={3}
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
