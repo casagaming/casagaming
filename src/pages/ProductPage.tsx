@@ -67,6 +67,7 @@ export default function ProductPage() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, [slug]);
 
+
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
@@ -256,69 +257,46 @@ export default function ProductPage() {
               </span>
             )}
 
-            {/* Arrow buttons on mobile when multiple images */}
+            {/* Arrow buttons */}
             {product.images.length > 1 && (
               <>
                 <button
                   onClick={prevImage}
-                  className="sm:hidden absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-black/60 text-white rounded-full z-10 active:scale-95"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-black/50 backdrop-blur-sm text-white rounded-full z-10 hover:bg-black/80 transition-all active:scale-90"
                   aria-label="Previous image"
                 >
                   <ChevronLeft size={20} />
                 </button>
                 <button
                   onClick={nextImage}
-                  className="sm:hidden absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-black/60 text-white rounded-full z-10 active:scale-95"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center bg-black/50 backdrop-blur-sm text-white rounded-full z-10 hover:bg-black/80 transition-all active:scale-90"
                   aria-label="Next image"
                 >
                   <ChevronRight size={20} />
                 </button>
-                <div className="sm:hidden absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-                  {product.images.map((_: any, idx: number) => (
-                    <button
-                      key={idx}
-                      onClick={() => { setActiveImageIndex(idx); setCurrentDisplayImage(null); }}
-                      className={`h-1.5 rounded-full transition-all ${
-                        activeImageIndex === idx ? 'bg-neon-blue w-5' : 'bg-white/60 w-1.5'
-                      }`}
-                    />
-                  ))}
-                </div>
               </>
             )}
-          </div>
 
-          {/* Thumbnails - mobile horizontal scroll + desktop grid */}
-          {product.images.length > 1 && (
-            <>
-              <div className="flex sm:hidden gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {product.images.map((img: string, index: number) => (
+            {/* Dots navigation inside image */}
+            {product.images.length > 1 && (
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+                {product.images.map((_: any, idx: number) => (
                   <button
-                    key={index}
-                    onClick={() => { setActiveImageIndex(index); setCurrentDisplayImage(null); }}
-                    className={`flex-shrink-0 w-16 h-16 border-2 transition-all overflow-hidden bg-bg-secondary ${
-                      (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color'
+                    key={idx}
+                    onClick={() => {
+                      setActiveImageIndex(idx);
+                      setCurrentDisplayImage(null);
+                    }}
+                    className={`rounded-full transition-all duration-500 ${
+                      activeImageIndex === idx
+                        ? 'bg-neon-blue w-6 h-2 shadow-[0_0_8px_rgba(0,243,255,0.8)]'
+                        : 'bg-white/40 w-2 h-2 hover:bg-white/70'
                     }`}
-                  >
-                    <img src={getHighQualityUrl(img, 200)} alt={`${product.name} ${index + 1}`} loading="lazy" className="w-full h-full object-cover" />
-                  </button>
+                  />
                 ))}
               </div>
-              <div className="hidden sm:grid grid-cols-4 sm:grid-cols-6 gap-3">
-                {product.images.map((img: string, index: number) => (
-                  <button
-                    key={index}
-                    onClick={() => { setActiveImageIndex(index); setCurrentDisplayImage(null); }}
-                    className={`aspect-square border-2 transition-all overflow-hidden bg-bg-secondary ${
-                      (activeImageIndex === index && !currentDisplayImage) ? 'border-neon-blue' : 'border-border-color hover:border-text-secondary'
-                    }`}
-                  >
-                    <img src={getHighQualityUrl(img, 200)} alt={`${product.name} ${index + 1}`} loading="lazy" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Product Details Section */}

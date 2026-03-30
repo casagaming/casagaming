@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { useLanguage } from '../context/LanguageContext';
 import { turso, parseImageUrl } from '../lib/turso';
@@ -12,13 +13,16 @@ interface RelatedProductsSliderProps {
 const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentProductId, categoryId }) => {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { language, t, isRTL } = useLanguage();
+  const [page, setPage] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const { language, isRTL } = useLanguage();
+
+  const ITEMS_PER_PAGE = 4;
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // Fetch all products except the current one
         const result = await turso.execute({
           sql: `SELECT p.id, p.name_en, p.name_ar, p.price, p.original_price, p.image_url,
                       p.is_new, p.is_sale, p.stock, p.rating, p.reviews_count,
@@ -50,10 +54,14 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
             name: language === 'ar' ? row[2] : row[1],
             image: images[0],
             hoverImage: images.length > 1 ? images[1] : undefined,
+            isNew: row[6],
+            isSale: row[7],
+            originalPrice: row[4],
             variants_count: row[13]
           };
         });
         setProducts(formatted);
+        setPage(0);
       } catch (error) {
         console.error('Error fetching related products:', error);
       } finally {
@@ -66,39 +74,84 @@ const RelatedProductsSlider: React.FC<RelatedProductsSliderProps> = ({ currentPr
 
   if (loading || products.length === 0) return null;
 
-  // Only animate if there are enough products to overflow
-  // On desktop we show 4-5 products. So if <= 4, keep it static.
-  const shouldAnimate = products.length > 4;
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const currentItems = products.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
-  const repeatCount = shouldAnimate ? Math.max(3, Math.ceil(20 / products.length)) : 1;
-  const displayProducts = shouldAnimate ? Array(repeatCount).fill(products).flat() : products;
-  const movePercentage = shouldAnimate ? -(100 / repeatCount) : 0;
+  const goNext = () => {
+    setDirection(1);
+    setPage((p) => (p + 1) % totalPages);
+  };
+
+  const goPrev = () => {
+    setDirection(-1);
+    setPage((p) => (p - 1 + totalPages) % totalPages);
+  };
+
+  const variants = {
+    enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+  };
 
   return (
-    <div className="mt-20 overflow-hidden py-10 border-t border-border-color">
-      <h2 className="text-2xl font-bold text-text-primary mb-10 font-display uppercase tracking-widest text-center px-4">
-        {language === 'ar' ? 'جميع المنتجات' : 'Tous les produits'}
-      </h2>
-      
-      <div className="relative">
-        <motion.div 
-          className={`flex gap-4 px-4 ${shouldAnimate ? 'w-max' : 'justify-center flex-wrap'}`}
-          animate={shouldAnimate ? {
-            x: isRTL ? [`${movePercentage}%`, "0%"] : ["0%", `${movePercentage}%`],
-          } : {}}
-          transition={{
-            duration: products.length * 5,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        >
-          {displayProducts.map((product, index) => (
-            <div key={`${product.id}-${index}`} className="w-[200px] md:w-[240px] flex-shrink-0">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </motion.div>
+    <div className="mt-20 py-10 border-t border-border-color">
+      <div className="flex items-center justify-between px-0 mb-8">
+        <h2 className="text-2xl font-bold text-text-primary font-display uppercase tracking-widest">
+          {language === 'ar' ? 'جميع المنتجات' : 'Tous les produits'}
+        </h2>
+
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goPrev}
+              className="w-9 h-9 flex items-center justify-center rounded-full border border-border-color text-text-secondary hover:border-neon-blue hover:text-neon-blue transition-all active:scale-90"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={goNext}
+              className="w-9 h-9 flex items-center justify-center rounded-full border border-border-color text-text-secondary hover:border-neon-blue hover:text-neon-blue transition-all active:scale-90"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        )}
       </div>
+
+      <div className="relative overflow-hidden">
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.div
+            key={page}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            className="grid grid-cols-4 gap-3 md:gap-6"
+          >
+            {currentItems.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-6">
+          {Array.from({ length: totalPages }).map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => { setDirection(idx > page ? 1 : -1); setPage(idx); }}
+              className={`rounded-full transition-all duration-400 ${
+                page === idx
+                  ? 'bg-neon-blue w-6 h-2 shadow-[0_0_8px_rgba(0,243,255,0.7)]'
+                  : 'bg-border-color w-2 h-2 hover:bg-text-secondary'
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

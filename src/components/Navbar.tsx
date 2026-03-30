@@ -6,25 +6,49 @@ import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useConfig } from '../context/ConfigContext';
 import { useLanguage } from '../context/LanguageContext';
+import { turso } from '../lib/turso';
 
-const NAV_LINKS = [
+interface Category {
+  id: string;
+  name_en: string;
+  name_ar: string;
+}
+
+const STATIC_NAV_LINKS = [
   { labelFr: 'Accueil', labelAr: 'الرئيسية', href: '/' },
   { labelFr: 'Tous les produits', labelAr: 'كل المنتجات', href: '/products' },
-  { labelFr: 'KEYBORDS', labelAr: 'KEYBORDS', href: '/products?category=KEYBORDS' },
-  { labelFr: 'KEYCAPS', labelAr: 'KEYCAPS', href: '/products?category=KEYCAPS' },
-  { labelFr: 'À Propos', labelAr: 'من نحن', href: '/about' },
 ];
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
   const { cartCount } = useCart();
   const { theme, toggleTheme } = useTheme();
   const { config } = useConfig();
   const { language, setLanguage, t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const result = await turso.execute(
+          'SELECT id, name_en, name_ar FROM categories ORDER BY name_en ASC'
+        );
+        const cats = result.rows.map((row: any) => ({
+          id: row[0] as string,
+          name_en: row[1] as string,
+          name_ar: row[2] as string,
+        }));
+        setCategories(cats);
+      } catch (error) {
+        console.error('Error fetching categories for nav:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const isActive = (href: string) => {
     if (href === '/') return location.pathname === '/';
@@ -176,7 +200,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex flex-col space-y-7 flex-1">
-                  {NAV_LINKS.map((link) => (
+                  {STATIC_NAV_LINKS.map((link) => (
                     <Link
                       key={link.href}
                       to={link.href}
@@ -188,6 +212,36 @@ export default function Navbar() {
                       {language === 'ar' ? link.labelAr : link.labelFr}
                     </Link>
                   ))}
+                  {categories.length > 0 && (
+                    <div className={`border-t border-border-color pt-6 flex flex-col space-y-5 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <span className="text-xs font-mono uppercase tracking-widest text-text-secondary">
+                        {language === 'ar' ? 'الأصناف' : 'Catégories'}
+                      </span>
+                      {categories.map((cat) => (
+                        <Link
+                          key={cat.id}
+                          to={`/products?category=${encodeURIComponent(cat.name_en)}`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={`text-xl font-display font-bold uppercase tracking-wider transition-colors ${
+                            location.search.includes(`category=${encodeURIComponent(cat.name_en)}`)
+                              ? 'text-neon-blue'
+                              : 'text-text-primary hover:text-neon-blue'
+                          }`}
+                        >
+                          {language === 'ar' ? cat.name_ar : cat.name_en}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                  <Link
+                    to="/about"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`text-2xl font-display font-bold uppercase tracking-wider transition-colors ${
+                      isActive('/about') ? 'text-neon-blue' : 'text-text-primary hover:text-neon-blue'
+                    }`}
+                  >
+                    {language === 'ar' ? 'من نحن' : 'À Propos'}
+                  </Link>
                 </div>
 
                 <div className="mt-auto pt-8 border-t border-border-color flex items-center justify-between">
