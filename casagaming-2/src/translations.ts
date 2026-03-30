@@ -1,0 +1,218 @@
+export type Language = 'fr' | 'ar';
+
+export const translations = {
+  fr: {
+    // Navbar
+    'nav.home': 'Accueil',
+    'nav.products': 'Produits',
+    'nav.categories': 'Catégories',
+    'nav.cart': 'Panier',
+    'nav.search': 'RECHERCHER...',
+    'nav.account': 'COMPTE',
+    'nav.wishlist': 'LISTE DE SOUHAITS',
+    
+    // Product Page
+    'product.back': 'Retour aux produits',
+    'product.reviews': 'AVIS',
+    'product.select_option': 'Choisir une option',
+    'product.sale': 'Solde',
+    'product.out_of_stock': 'Rupture de stock',
+    'product.low_stock': 'Quantité limitée disponible',
+    'product.in_stock': 'Produit actuellement en stock',
+    'product.add_to_cart': 'Ajouter au panier',
+    'product.view_product': 'Voir le produit',
+    'product.order_whatsapp': 'Commander via WhatsApp',
+    'product.buy_now': 'Acheter maintenant',
+    'product.free_shipping': 'Livraison dans toutes les wilayas',
+    'product.free_shipping_desc': 'Disponible dans les 58 wilayas',
+    'product.quality': 'Qualité premium',
+    'product.quality_desc': 'Matériaux haut de gamme et durables',
+    'product.description': 'Description',
+    'product.currency': 'DA',
+    
+    // Cart
+    'cart.title': 'Votre Panier',
+    'cart.empty': 'Votre panier est vide',
+    'cart.checkout': 'Passer à la caisse',
+    'cart.subtotal': 'Sous-total',
+    'cart.total': 'Total',
+    
+    // Footer
+    'footer.shop': 'Boutique',
+    'footer.support': 'Support',
+    'footer.contact': 'Contact',
+    'footer.all_products': 'Tous les produits',
+    'footer.privacy': 'Politique de Confidentialité',
+    'footer.terms': 'Conditions d\'Utilisation',
+    'footer.about': 'À propos de nous',
+    'footer.description': 'Équipement de jeu haut de gamme pour une configuration ultime. Améliorez votre gameplay avec nos périphériques et accessoires haute performance.',
+    'footer.rights': 'Tous droits réservés.',
+    'marquee.delivery': 'Livraison disponible dans 58 wilayas avec paiement à la réception // Paiement à la livraison // 58 Wilayas // Rapide et Fiable //',
+    
+    // Checkout
+    'checkout.title': 'Caisse',
+    'checkout.contact_info': 'Informations de Contact',
+    'checkout.first_name': 'PRÉNOM',
+    'checkout.last_name': 'NOM',
+    'checkout.phone': 'NUMÉRO DE TÉLÉPHONE',
+    'checkout.shipping_details': 'Détails d\'Expédition',
+    'checkout.wilaya': 'Wilaya',
+    'checkout.commune': 'Commune',
+    'checkout.delivery_method': 'Mode de Livraison',
+    'checkout.home_delivery': 'Livraison à Domicile',
+    'checkout.stop_desk': 'Livraison (Anderson)',
+    'checkout.address': 'Adresse Complète',
+    'checkout.confirm': 'Confirmer la Commande',
+    'checkout.processing': 'Traitement...',
+    'checkout.summary': 'Résumé de la Commande',
+    'checkout.shipping_cost': 'Frais de livraison',
+    'checkout.total': 'Total à payer',
+
+    // Order Received
+    'order.received': 'Commande Reçue !',
+    'order.thank_you': 'Merci pour votre achat. Votre commande est en cours de traitement.',
+    'order.id': 'ID de Commande',
+    'order.not_found': 'Commande Non Trouvée',
+    'order.not_found_desc': 'Nous n\'avons pas pu récupérer les détails de votre commande. Veuillez contacter le support si vous pensez qu\'il s\'agit d\'une erreur.',
+    'order.return_home': 'Retour à l\'Accueil',
+
+    // Categories
+    'categories.title': 'Toutes les Catégories',
+    'categories.desc': 'Explorez notre collection complète de matériel de jeu haut de gamme, méticuleusement organisée pour votre installation parfaite.',
+
+    // Sort
+    'sort.label': 'Trier par',
+    'sort.default': 'Par défaut',
+    'sort.price_high_low': 'Prix : élevé → bas',
+    'sort.price_low_high': 'Prix : bas → élevé',
+
+    // Filters
+    'filter.price_range': 'Prix (DA)',
+    'filter.min': 'Min',
+    'filter.max': 'Max',
+    'filter.new_only': 'Nouveautés',
+    'filter.sale_only': 'En solde',
+    'filter.in_stock': 'En stock',
+    'filter.active': 'Filtres actifs',
+    'filter.clear_all': 'Tout effacer',
+    'filter.results': 'résultats',
+
+    // Categories filter
+    'categories.search': 'Rechercher une catégorie...',
+    'categories.not_found': 'Aucune catégorie trouvée.',
+
+    // Common
+    'common.loading': 'Chargement...',
+    'common.error': 'Une erreur est survenue',
+    'common.search_placeholder': 'RECHERCHER...',
+    'common.select': 'Sélectionner'
+  },
+  ar: {
+    // Navbar
+    'nav.home': 'الرئيسية',
+    'nav.products': 'المنتجات',
+    'nav.categories': 'التصنيفات',
+    'nav.cart': 'السلة',
+    'nav.search': 'بحث...',
+    'nav.account': 'الحساب',
+    'nav.wishlist': 'قائمة الأمنيات',
+    
+    // Product Page
+    'product.back': 'العودة للمنتجات',
+    'product.reviews': 'تقييمات',
+    'product.select_option': 'اختر خياراً',
+    'product.sale': 'تخفيض',
+    'product.out_of_stock': 'نفذ من المخزن',
+    'product.low_stock': 'كمية محدودة متوفرة',
+    'product.in_stock': 'المنتج متوفر حالياً',
+    'product.add_to_cart': 'أضف للسلة',
+    'product.view_product': 'عرض المنتج',
+    'product.order_whatsapp': 'طلب عبر الواتساب',
+    'product.buy_now': 'اشتري الآن',
+    'product.free_shipping': 'شحن لجميع الولايات',
+    'product.free_shipping_desc': 'متوفر في جميع الولايات الـ 58',
+    'product.quality': 'جودة ممتازة',
+    'product.quality_desc': 'مواد عالية الجودة وطويلة الأمد',
+    'product.description': 'الوصف',
+    'product.currency': 'دج',
+    
+    // Cart
+    'cart.title': 'سلتك',
+    'cart.empty': 'سلتك فارغة',
+    'cart.checkout': 'إتمام الطلب',
+    'cart.subtotal': 'المجموع الفرعي',
+    'cart.total': 'المجموع الكلي',
+    
+    // Footer
+    'footer.shop': 'المتجر',
+    'footer.support': 'الدعم',
+    'footer.contact': 'اتصل بنا',
+    'footer.all_products': 'كل المنتجات',
+    'footer.privacy': 'سياسة الخصوصية',
+    'footer.terms': 'شروط الخدمة',
+    'footer.about': 'من نحن',
+    'footer.description': 'معدات ألعاب متميزة للإعداد المثالي. ارتقِ بلعبك من خلال ملحقاتنا وإكسسواراتنا عالية الأداء.',
+    'footer.rights': 'جميع الحقوق محفوظة.',
+    'marquee.delivery': 'التوصيل متوفر لجميع الولايات (58 ولاية) مع الدفع عند الاستلام // الدفع عند الاستلام // 58 ولاية // سريع وموثوق //',
+    
+    // Checkout
+    'checkout.title': 'إتمام الطلب',
+    'checkout.contact_info': 'معلومات الاتصال',
+    'checkout.first_name': 'الاسم',
+    'checkout.last_name': 'اللقب',
+    'checkout.phone': 'رقم الهاتف',
+    'checkout.shipping_details': 'تفاصيل الشحن',
+    'checkout.wilaya': 'الولاية',
+    'checkout.commune': 'البلدية',
+    'checkout.delivery_method': 'طريقة التوصيل',
+    'checkout.home_delivery': 'توصيل للمنزل',
+    'checkout.stop_desk': 'توصيل (Anderson)',
+    'checkout.address': 'العنوان الكامل',
+    'checkout.confirm': 'تأكيد الطلب',
+    'checkout.processing': 'جاري المعالجة...',
+    'checkout.summary': 'ملخص الطلب',
+    'checkout.shipping_cost': 'مصاريف الشحن',
+    'checkout.total': 'المجموع الكلي',
+
+    // Order Received
+    'order.received': 'تم استلام الطلب!',
+    'order.thank_you': 'شكراً لك على طلبك. جاري معالجة طلبك حالياً.',
+    'order.id': 'رقم الطلب',
+    'order.not_found': 'الطلب غير موجود',
+    'order.not_found_desc': 'لم نتمكن من العثور على تفاصيل طلبك. يرجى الاتصال بالدعم إذا كنت تعتقد أن هناك خطأ.',
+    'order.return_home': 'العودة للرئيسية',
+
+    // Categories
+    'categories.title': 'كل التصنيفات',
+    'categories.desc': 'استكشف مجموعتنا الكاملة من معدات الألعاب الممتازة، المنظمة بعناية لتناسب إعدادك المثالي.',
+
+    // Sort
+    'sort.label': 'ترتيب حسب',
+    'sort.default': 'الافتراضي',
+    'sort.price_high_low': 'السعر: من الأغلى للأرخص',
+    'sort.price_low_high': 'السعر: من الأرخص للأغلى',
+
+    // Filters
+    'filter.price_range': 'السعر (دج)',
+    'filter.min': 'الأدنى',
+    'filter.max': 'الأعلى',
+    'filter.new_only': 'جديد',
+    'filter.sale_only': 'عروض',
+    'filter.in_stock': 'متوفر',
+    'filter.active': 'الفلاتر النشطة',
+    'filter.clear_all': 'مسح الكل',
+    'filter.results': 'نتيجة',
+
+    // Categories filter
+    'categories.search': 'ابحث عن صنف...',
+    'categories.not_found': 'لا توجد أصناف مطابقة.',
+
+    // Common
+    'common.loading': 'جاري التحميل...',
+    'common.error': 'حدث خطأ ما',
+    'common.search_placeholder': 'بحث...',
+    'common.select': 'اختيار'
+  }
+};
+
+export type TranslationKey = keyof typeof translations.fr;

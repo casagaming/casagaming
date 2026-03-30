@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Premium gaming gear and setup accessories store featuring mechanical keyboards, mice, and desk mats." />
+    <meta property="og:title" content="Casa Gaming" />
+    <meta property="og:description" content="Premium gaming gear and setup accessories store featuring mechanical keyboards, mice, and desk mats." />
+    <meta property="og:image" content="https://res.cloudinary.com/ddsikz7wq/image/upload/v1774708315/oglm1qefty0ccde20lrk.jpg" />
+    <meta property="og:site_name" content="Casa Gaming" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
+    <link rel="apple-touch-icon" href="/favicon.jpg" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Casa Gaming</title>
+
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="preconnect" href="https://casagaming1-casagaming.aws-eu-west-1.turso.io" crossorigin />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+    <link rel="dns-prefetch" href="https://casagaming1-casagaming.aws-eu-west-1.turso.io" />
+
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('theme');
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+        } catch(e) {}
+      })();
+    </script>
+
+    <style>
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        background: #ffffff;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.4s ease;
+      }
+      .dark #initial-loader,
+      html.dark #initial-loader {
+        background: #050505;
+      }
+      #initial-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .loader-ring {
+        width: 48px;
+        height: 48px;
+        border: 3px solid #e4e4e7;
+        border-top-color: #00f3ff;
+        border-radius: 50%;
+        animation: loader-spin 0.75s linear infinite;
+      }
+      html.dark .loader-ring {
+        border-color: #27272a;
+        border-top-color: #00f3ff;
+      }
+      @keyframes loader-spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="initial-loader">
+      <div class="loader-ring"></div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

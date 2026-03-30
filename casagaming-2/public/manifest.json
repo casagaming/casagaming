@@ -1,0 +1,16 @@
+{
+  "name": "Casa Gaming",
+  "short_name": "Casa Gaming",
+  "description": "Premium gaming gear and setup accessories store",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#00f3ff",
+  "icons": [
+    {
+      "src": "/favicon.jpg",
+      "sizes": "any",
+      "type": "image/jpeg"
+    }
+  ]
+}
