@@ -39,7 +39,7 @@ export default function HomePage() {
         ]);
 
         const mapProduct = (row: any) => {
-          const images = parseImageUrl(row[5], 200);
+          const images = parseImageUrl(row[5], 315);
           return {
             id: row[0], name_en: row[1], name_ar: row[2],
             price: row[3], original_price: row[4], image_url: row[5],
@@ -91,7 +91,7 @@ export default function HomePage() {
 
 
 
-      <section className="py-24 bg-bg-secondary border-y border-border-color transition-colors duration-300 min-h-[300px]">
+      <section className="py-24 bg-bg-secondary border-y border-border-color transition-colors duration-300 min-h-[400px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <div className="p-8 border border-border-color hover:border-neon-blue/30 transition-colors group bg-bg-primary">

@@ -95,7 +95,7 @@ export default function Navbar() {
                 <img src={config.logo_url} alt={config.store_name || 'Casa Gaming'} className="h-8 sm:h-10 w-auto object-contain" />
               ) : (
                 <span className="font-display font-bold text-xl sm:text-2xl tracking-tighter leading-none text-text-primary group-hover:text-neon-blue transition-colors duration-300">
-                  CASA<span className="text-neon-blue">GAMING</span>
+                  CASA<span className="text-neon-blue drop-shadow-lg">GAMING</span>
                 </span>
               )}
             </Link>

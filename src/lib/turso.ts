@@ -125,8 +125,8 @@ export function getOptimizedImageUrl(url: string | null | undefined, width?: num
     if (alreadyHasTransforms) return url;
 
     const transforms = width
-      ? `f_auto,q_auto:best,w_${width},c_limit`
-      : `f_auto,q_auto:best`;
+      ? `f_auto,q_auto:eco,w_${width},c_limit`
+      : `f_auto,q_auto:eco`;
 
     return url.replace('/upload/', `/upload/${transforms}/`);
   }

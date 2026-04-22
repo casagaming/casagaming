@@ -42,7 +42,7 @@ export default function Footer() {
                     </svg>
                   </div>
                   <span className="font-display font-bold text-xl tracking-wider">
-                    <span className="text-neon-blue">CASA</span>
+                    <span className="text-neon-blue drop-shadow-lg">CASA</span>
                     <span className="text-neon-purple ml-1">GAMING</span>
                   </span>
                 </>
