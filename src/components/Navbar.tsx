@@ -84,6 +84,7 @@ export default function Navbar() {
             <button
               className="p-2 -ml-1 text-text-primary hover:text-neon-blue transition-colors flex-shrink-0"
               onClick={() => setIsMobileMenuOpen(true)}
+              aria-label={language === 'ar' ? 'فتح القائمة' : 'Open menu'}
             >
               <Menu size={22} />
             </button>
@@ -105,6 +106,7 @@ export default function Navbar() {
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className={`p-1.5 transition-colors flex-shrink-0 ${isSearchOpen ? 'text-neon-blue' : 'text-text-secondary hover:text-text-primary'}`}
+                aria-label={language === 'ar' ? 'البحث' : 'Search'}
               >
                 <Search size={20} />
               </button>
@@ -113,6 +115,7 @@ export default function Navbar() {
               <button
                 onClick={toggleTheme}
                 className="p-1.5 text-text-secondary hover:text-text-primary transition-colors flex-shrink-0"
+                aria-label={language === 'ar' ? 'تبديل السمة' : 'Toggle theme'}
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
@@ -121,12 +124,13 @@ export default function Navbar() {
               <button
                 onClick={() => setLanguage(language === 'fr' ? 'ar' : 'fr')}
                 className="text-text-secondary hover:text-text-primary transition-colors font-mono font-bold text-xs border border-border-color px-1.5 py-0.5 rounded hover:border-neon-blue flex-shrink-0"
+                aria-label={language === 'ar' ? 'تبديل اللغة' : 'Toggle language'}
               >
                 {language === 'fr' ? 'AR' : 'FR'}
               </button>
 
               {/* Cart */}
-              <Link to="/cart" className="relative p-1.5 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1 flex-shrink-0">
+              <Link to="/cart" className="relative p-1.5 text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1 flex-shrink-0" aria-label={language === 'ar' ? 'السلة' : 'Cart'}>
                 <ShoppingCart size={20} />
                 {cartCount > 0 && (
                   <span className="font-mono text-xs font-bold text-neon-blue">[{cartCount}]</span>

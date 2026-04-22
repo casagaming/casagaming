@@ -91,7 +91,7 @@ export default function HomePage() {
 
 
 
-      <section className="py-24 bg-bg-secondary border-y border-border-color transition-colors duration-300">
+      <section className="py-24 bg-bg-secondary border-y border-border-color transition-colors duration-300 min-h-[300px]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <div className="p-8 border border-border-color hover:border-neon-blue/30 transition-colors group bg-bg-primary">

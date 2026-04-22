@@ -60,6 +60,7 @@ export default function MobileBottomNav() {
                 className={`flex flex-col items-center gap-1 transition-colors ${
                   item.active ? 'text-neon-blue' : 'text-text-secondary'
                 }`}
+                aria-label={item.label}
               >
                 <div className="relative">
                   <item.icon size={24} strokeWidth={item.active ? 2.5 : 2} />
@@ -79,6 +80,7 @@ export default function MobileBottomNav() {
                 className={`flex flex-col items-center gap-1 transition-colors ${
                   item.active ? 'text-neon-blue' : 'text-text-secondary'
                 }`}
+                aria-label={item.label}
               >
                 <item.icon size={24} strokeWidth={item.active ? 2.5 : 2} />
                 <span className="text-[10px] font-medium uppercase tracking-tighter">
