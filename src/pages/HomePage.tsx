@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Hero from '../components/Hero';
-import ProductGrid from '../components/ProductGrid';
+const ProductGrid = React.lazy(() => import('../components/ProductGrid'));
 import Marquee from '../components/Marquee';
 import { ShieldCheck, Truck } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -39,7 +39,7 @@ export default function HomePage() {
         ]);
 
         const mapProduct = (row: any) => {
-          const images = parseImageUrl(row[5], 400);
+          const images = parseImageUrl(row[5], 200);
           return {
             id: row[0], name_en: row[1], name_ar: row[2],
             price: row[3], original_price: row[4], image_url: row[5],
@@ -70,19 +70,23 @@ export default function HomePage() {
       <Marquee />
 
       {popularProducts.length > 0 && (
-        <ProductGrid
-          title={language === 'ar' ? 'الأكثر شعبية' : 'Produits Populaires'}
-          products={popularProducts}
-          linkHref="/products"
-        />
+        <Suspense fallback={<div className="py-12 text-center">Loading...</div>}>
+          <ProductGrid
+            title={language === 'ar' ? 'الأكثر شعبية' : 'Produits Populaires'}
+            products={popularProducts}
+            linkHref="/products"
+          />
+        </Suspense>
       )}
 
       {newArrivals.length > 0 && (
-        <ProductGrid
-          title={language === 'ar' ? 'وصل حديثاً' : 'Nouveautés'}
-          products={newArrivals}
-          linkHref="/products"
-        />
+        <Suspense fallback={<div className="py-12 text-center">Loading...</div>}>
+          <ProductGrid
+            title={language === 'ar' ? 'وصل حديثاً' : 'Nouveautés'}
+            products={newArrivals}
+            linkHref="/products"
+          />
+        </Suspense>
       )}
 
 

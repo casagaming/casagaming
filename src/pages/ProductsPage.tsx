@@ -36,7 +36,7 @@ export default function ProductsPage() {
         );
 
         const formatted = productsResult.rows.map((row: any) => {
-          const images = parseImageUrl(row[5], 400);
+          const images = parseImageUrl(row[5], 200);
           return {
             id: row[0],
             name_en: row[1],

@@ -64,6 +64,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             alt={productName}
             loading="lazy"
             decoding="async"
+            width="400"
+            height="400"
             className="w-full h-full object-cover transition-opacity duration-300 opacity-90 group-hover:opacity-100"
           />
           {product.hoverImage && (
@@ -72,6 +74,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               alt={productName}
               loading="lazy"
               decoding="async"
+              width="400"
+              height="400"
               className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             />
           )}

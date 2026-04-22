@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { LazyMotion, domAnimation, AnimatePresence, motion } from 'motion/react';
 import { turso, getOptimizedImageUrl } from '../lib/turso';
 
 export default function Hero() {
@@ -42,12 +42,13 @@ export default function Hero() {
   return (
     <div className="relative h-[30vh] md:h-[55vh] w-full overflow-hidden bg-bg-primary transition-colors duration-300">
       <div className="absolute inset-0">
-        <AnimatePresence mode="popLayout">
-          <motion.img
-            key={currentIndex}
-            src={images[currentIndex]}
-            alt="Hero Background"
-            className="absolute inset-0 w-full h-full object-cover"
+        <LazyMotion features={domAnimation}>
+          <AnimatePresence mode="popLayout">
+            <motion.img
+              key={currentIndex}
+              src={images[currentIndex]}
+              alt="Hero Background"
+              className="absolute inset-0 w-full h-full object-cover"
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
@@ -56,6 +57,7 @@ export default function Hero() {
             loading={currentIndex === 0 ? 'eager' : 'lazy'}
           />
         </AnimatePresence>
+        </LazyMotion>
         <div className="absolute inset-0 bg-black/30" />
       </div>
     </div>
