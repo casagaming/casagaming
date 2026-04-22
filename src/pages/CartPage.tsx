@@ -74,10 +74,10 @@ export default function CartPage() {
                       >
                         -
                       </button>
-                      <span className=\"px-2 font-bold text-text-primary text-sm font-mono w-8 text-center\" aria-label={`${item.quantity} ${language === 'ar' ? 'قطعة' : 'quantity'}`}>{item.quantity}</span>
+                      <span className="px-2 font-bold text-text-primary text-sm font-mono w-8 text-center" aria-label={`${item.quantity} ${language === 'ar' ? 'قطعة' : 'quantity'}`}>{item.quantity}</span>
                       <button 
                         onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                        className=\"px-3 text-text-primary hover:bg-text-primary/10 h-full transition-colors\"
+                        className="px-3 text-text-primary hover:bg-text-primary/10 h-full transition-colors"
                         aria-label={language === 'ar' ? 'زيادة الكمية' : 'Increase quantity'}
                       >
                         +

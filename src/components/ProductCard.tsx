@@ -33,6 +33,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.key === 'Enter' || e.key === ' ') && product.variants_count === 0 && !isOutOfStock) {
+      e.preventDefault();
+      addToCart(product);
+      addToast(language === 'ar' ? `تم إضافة ${productName} إلى السلة` : `Ajouté ${productName} au panier`, 'success');
+    }
+  };
+
   return (
     <div
       className={`group relative bg-card-bg border border-border-color hover:border-neon-blue transition-colors duration-300 ${isRTL ? 'text-right' : 'text-left'}`}
@@ -111,13 +119,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               onClick={product.variants_count > 0 ? undefined : handleAddToCart}
               className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-colors duration-200 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} font-mono flex items-center justify-center gap-2 bg-neon-blue text-black hover:bg-neon-blue/80`}
               role="button"
-              tabIndex={0}
+              tabIndex={isOutOfStock ? -1 : 0}
               aria-label={isOutOfStock ? (language === 'ar' ? 'نفذ' : 'Sold Out') : (product.variants_count > 0 ? t('product.view_product') : t('product.add_to_cart'))}
-              onKeyDown={(e) => {
-                if ((e.key === 'Enter' || e.key === ' ') && product.variants_count === 0 && !isOutOfStock) {
-                  handleAddToCart(e as any);
-                }
-              }}
+              onKeyDown={handleKeyDown}
             >
               {isOutOfStock 
                 ? (language === 'ar' ? 'نفذ' : 'Sold Out') 
