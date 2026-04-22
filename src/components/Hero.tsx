@@ -49,13 +49,13 @@ export default function Hero() {
               src={images[currentIndex]}
               alt="Hero Background"
               className="absolute inset-0 w-full h-full object-cover"
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 2.5, ease: "easeInOut" }}
-            fetchPriority={currentIndex === 0 ? 'high' : 'low'}
-            loading={currentIndex === 0 ? 'eager' : 'lazy'}
-          />
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2.5, ease: "easeInOut" }}
+              fetchPriority={currentIndex === 0 ? 'high' : 'low'}
+              loading={currentIndex === 0 ? 'eager' : 'lazy'}
+            />
         </AnimatePresence>
         </LazyMotion>
         <div className="absolute inset-0 bg-black/30" />

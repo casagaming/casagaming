@@ -64,8 +64,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             alt={productName}
             loading="lazy"
             decoding="async"
-            width="400"
-            height="400"
+            width="315"
+            height="315"
+            fetchPriority={product.isNew ? 'high' : 'auto'}
             className="w-full h-full object-cover transition-opacity duration-300 opacity-90 group-hover:opacity-100"
           />
           {product.hoverImage && (
@@ -74,8 +75,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               alt={productName}
               loading="lazy"
               decoding="async"
-              width="400"
-              height="400"
+              width="315"
+              height="315"
               className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             />
           )}
@@ -106,9 +107,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               )}
             </div>
             
-            <div 
+            <div
               onClick={product.variants_count > 0 ? undefined : handleAddToCart}
               className={`w-full py-2.5 px-4 text-[10px] md:text-xs uppercase font-bold tracking-widest transition-colors duration-200 ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} font-mono flex items-center justify-center gap-2 bg-neon-blue text-black hover:bg-neon-blue/80`}
+              role="button"
+              tabIndex={0}
+              aria-label={isOutOfStock ? (language === 'ar' ? 'نفذ' : 'Sold Out') : (product.variants_count > 0 ? t('product.view_product') : t('product.add_to_cart'))}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && product.variants_count === 0 && !isOutOfStock) {
+                  handleAddToCart(e as any);
+                }
+              }}
             >
               {isOutOfStock 
                 ? (language === 'ar' ? 'نفذ' : 'Sold Out') 

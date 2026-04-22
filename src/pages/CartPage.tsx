@@ -54,6 +54,7 @@ export default function CartPage() {
                       <button 
                         onClick={() => removeFromCart(item.cartItemId)}
                         className="text-red-500 text-xs hover:text-red-400 flex items-center gap-1 uppercase font-bold tracking-wider"
+                        aria-label={language === 'ar' ? `إزالة ${item.name_ar || item.name} من السلة` : `Remove ${item.name_en || item.name} from cart`}
                       >
                         <Trash2 size={14} /> {language === 'ar' ? 'إزالة' : 'Supprimer'}
                       </button>
@@ -69,13 +70,15 @@ export default function CartPage() {
                       <button 
                         onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                         className="px-3 text-text-primary hover:bg-text-primary/10 h-full transition-colors"
+                        aria-label={language === 'ar' ? 'تقليل الكمية' : 'Decrease quantity'}
                       >
                         -
                       </button>
-                      <span className="px-2 font-bold text-text-primary text-sm font-mono w-8 text-center">{item.quantity}</span>
+                      <span className=\"px-2 font-bold text-text-primary text-sm font-mono w-8 text-center\" aria-label={`${item.quantity} ${language === 'ar' ? 'قطعة' : 'quantity'}`}>{item.quantity}</span>
                       <button 
                         onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                        className="px-3 text-text-primary hover:bg-text-primary/10 h-full transition-colors"
+                        className=\"px-3 text-text-primary hover:bg-text-primary/10 h-full transition-colors\"
+                        aria-label={language === 'ar' ? 'زيادة الكمية' : 'Increase quantity'}
                       >
                         +
                       </button>
